@@ -1,6 +1,8 @@
 import tkinter as tk
 import tweepy
 import praw
+#from mydata import *
+from crawler import *
 
 queryLimit = 5
 
@@ -13,6 +15,9 @@ access_token_secret = "r5O5AQYHDZrddrPki5FKDZUritllO3VRSoCIlHJv84UEA"
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret) #Creating the authentication object
 auth.set_access_token(access_token, access_token_secret) # Setting your access token and secret
 api = tweepy.API(auth,wait_on_rate_limit=True) # Creating the API object while passing in auth information
+
+c = redditCrawler()
+c.search("test")
 
 #Reddit
 reddit = praw.Reddit(client_id='PESO3cS0KquaWQ', client_secret='ALSLenkZwZ5WCZ-32MaziUw-O7tmeA', user_agent='VanillaCast')
