@@ -7,17 +7,20 @@ from crawler import *
 queryLimit = 5
 
 #Twitter
-consumer_key = "VpNVndPOykZXjQgfTg2RD21xz"
-consumer_secret = "1LyM7m5lTmNWwzUUSJF2kN04B5bZvRStY663PjNEnQRCS6b2QW"
-access_token = "1358367734417903620-liyj12fLuUrQGM09nsqiVqiAsFKuRc"
-access_token_secret = "r5O5AQYHDZrddrPki5FKDZUritllO3VRSoCIlHJv84UEA"
-
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret) #Creating the authentication object
-auth.set_access_token(access_token, access_token_secret) # Setting your access token and secret
-api = tweepy.API(auth,wait_on_rate_limit=True) # Creating the API object while passing in auth information
+#consumer_key = "VpNVndPOykZXjQgfTg2RD21xz"
+#consumer_secret = "1LyM7m5lTmNWwzUUSJF2kN04B5bZvRStY663PjNEnQRCS6b2QW"
+#access_token = "1358367734417903620-liyj12fLuUrQGM09nsqiVqiAsFKuRc"
+#access_token_secret = "r5O5AQYHDZrddrPki5FKDZUritllO3VRSoCIlHJv84UEA"
+#
+#auth = tweepy.OAuthHandler(consumer_key, consumer_secret) #Creating the authentication object
+#auth.set_access_token(access_token, access_token_secret) # Setting your access token and secret
+#api = tweepy.API(auth,wait_on_rate_limit=True) # Creating the API object while passing in auth information
 
 c = redditCrawler()
 c.search("test")
+
+t = twitterCrawler()
+t.search("test")
 
 #Reddit
 reddit = praw.Reddit(client_id='PESO3cS0KquaWQ', client_secret='ALSLenkZwZ5WCZ-32MaziUw-O7tmeA', user_agent='VanillaCast')
@@ -30,18 +33,18 @@ def show_entry_fields():
     val = "Query: %s" % (e1.get())
     e3.insert(tk.END, val)
 
-    query = e1.get() + " -filter:retweets" # The search term you want to find
-    language = "en" #language
-    results = api.search(q=query, lang=language, rpp=queryLimit) #initiate API call
+    #query = e1.get() + " -filter:retweets" # The search term you want to find
+    #language = "en" #language
+    #results = api.search(q=query, lang=language, rpp=queryLimit) #initiate API call
 
-    for tweet in results: # iterate through every tweets pulled
-        # printing the text stored inside the tweet object
-        e3.insert(tk.END, "\n\n")
-        e3.insert(tk.END, "User: " + tweet.user.screen_name)
-        e3.insert(tk.END, "\n")
-        e3.insert(tk.END, "Tweeted: \n")
-        e3.insert(tk.END, tweet.text)
-        e3.insert(tk.END, "\n------------------------------------------------")
+    #for tweet in results: # iterate through every tweets pulled
+    #    # printing the text stored inside the tweet object
+    #    e3.insert(tk.END, "\n\n")
+    #    e3.insert(tk.END, "User: " + tweet.user.screen_name)
+    #    e3.insert(tk.END, "\n")
+    #    e3.insert(tk.END, "Tweeted: \n")
+    #    e3.insert(tk.END, tweet.text)
+    #    e3.insert(tk.END, "\n------------------------------------------------")
 
     redditCrawl()
 
