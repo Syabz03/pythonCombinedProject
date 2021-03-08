@@ -95,3 +95,40 @@ if __name__ == '__main__':
     tab_parent.add(tab2, text="Add New Record")
 
     window.mainloop()
+    
+    
+
+
+# 
+# Height = 720
+# WIDTH = 1280
+# 
+# def crawl_web():
+#     print("Button Clicked")
+# 
+# root = GUI.Tk()
+# 
+# canvas = GUI.Canvas(root, height=Height, width=WIDTH)
+# canvas.pack()
+# 
+# background_image = GUI.PhotoImage(file='office_chi.png')
+# background_label = GUI.Label(root, image=background_image)
+# background_label.place(relwidth=1, relheight=1)
+# 
+# frame = GUI.Frame(root, bg='#80c1ff', bd=5)
+# frame.place(relx=0.5, rely=0.1, relwidth=0.75, relheight=0.1, anchor='n')
+# 
+# entry = GUI.Entry(frame, font=42)
+# entry.place(relwidth=0.65, relheight=1)
+# 
+# button = GUI.Button(frame, text="Search!", font=42)
+# button.place(relx=0.7, relheight=1, relwidth=0.25)
+# 
+# lower_frame = GUI.Frame(root, bg='#80c1ff', bd=5)
+# lower_frame.place(relx=0.5, rely=0.25, relwidth=0.75, relheight=0.6, anchor='n')
+# 
+# label = GUI.Label(lower_frame, text="This is a label")
+# label.place(relwidth=1, relheight=1)
+# 
+# 
+# root.mainloop()
