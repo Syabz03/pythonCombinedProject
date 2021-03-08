@@ -5,7 +5,7 @@ from mydata import *
 
 class crawler:
     data =''
-    url=''
+    topic = ''
 
     def search(self):
         pass
@@ -22,8 +22,8 @@ class redditCrawler(crawler):
             client_id='zo7beVRdF2cE8w', 
             client_secret='NQtiZSmriDzkW6hY-HaACbG86Nytpw', 
             user_agent='Java tests',
-            password = "no",
-            username="later"
+            #password = "no",
+            #username="later"
         )
 
     def search(self,input):
@@ -34,18 +34,18 @@ class redditCrawler(crawler):
         input = "hololive"
         self.trawler(input)
         for submission in self.reddit.subreddit("all").search(input,'hot',limit=10):
-            block = Mydata(input)
-            block.addComment(submission.title)
+            self.data = Mydata(input)
+            self.data.addComment(submission.title)
             iCount = submission.upvote_ratio
-            iCount = submission.score/(iCount-(1-iCount))
+            iCount = submission.score/iCount #score if definitly true but the upvote ratio might not be
             iCount *= 100
-            block.addLikeCount(int(iCount))
+            self.data.addLikeCount(int(iCount))
         
         #print(block.interactionCount)
         # for c in block.topComments:
         #     print(c)
         
-        return block
+        return self.data
             # print("Title: ",submission.title)
             # print("Author: ",submission.author)
             # print("link: ",submission.permalink)
@@ -62,13 +62,15 @@ class redditCrawler(crawler):
         for c in lst:
             print(c.display_name)
             print(c.subscribers)
-            try:
-                var1=c.traffic() #var1 is a dict obj' IMPORTANT 
-                varlst = var1["day"] 
-                print(varlst[1])
-            except prawcore.NotFound:
-                print("not allowed to view trafic")
-                #always throws even when data is correct
+            # try:   NEED TO BE A MOD OF THE SUBREDDIT FOR THIS TO WORK
+            #     var1=c.traffic() #var1 is a dict obj' IMPORTANT 
+            #     print(len(var1))
+            #     # varlst = var1["day"] 
+            #     # print(varlst[0])
+            #     # print(varlst[1])
+            #     # print(varlst[2])
+            # except prawcore.NotFound:
+            #     print("not allowed to view trafic")
         
     
     def format(self, block):
