@@ -1,14 +1,15 @@
 import tweepy
 import praw
 import prawcore
+from abc import ABC, abstractmethod 
 from mydata import *
 
-class crawler:
+class crawler():
     data =''
     topic = ''
 
-    def search(self):
-        pass
+    def search(self,input):
+        self.topic = input
 
     def format(self, block):
         pass
@@ -30,22 +31,62 @@ class redditCrawler(crawler):
         #problem is that we are relying on reddit sorting system
         # and unrelated post may come up
         # i.e. GPU might come up in a escape from tarkov post
+        super().search(input)
 
-        input = "hololive"
-        self.trawler(input)
-        for submission in self.reddit.subreddit("all").search(input,'hot',limit=10):
+        #V1
+        for submission in self.reddit.subreddit("all").search(self.topic,'top',limit=1):
             self.data = Mydata(input)
             self.data.addComment(submission.title)
             iCount = submission.upvote_ratio
             iCount = submission.score/iCount #score if definitly true but the upvote ratio might not be
             iCount *= 100
             self.data.addLikeCount(int(iCount))
-        
-        #print(block.interactionCount)
-        # for c in block.topComments:
-        #     print(c)
-        
+
+        #V2
+        self.topic = input
+        multiReddit = self.reddit.subreddits.search(self.topic,limit=5)
+        for subr in multiReddit:
+            print("---------------------------------------------------------------------------------------------------------------")
+            print(subr.display_name)
+            print(subr.subscribers)
+            self.trawl(subr)
+
+        # c in this case is a subreddit obj
+        # cannot iterate here as the end of the list will be reached
+        # for c in lst:
+        #     print(c.display_name)
+        #     print(c.subscribers)
+
+        print(len(self.data.topComments))
         return self.data
+
+
+    def trawl(self,sreddit):
+        # check if there is a related subreddit
+        
+        #pseudo 
+        if self.topic.lower() in str(sreddit.display_name).lower():
+            print('in if')
+            for post in sreddit.top(time_filter='week',limit=100):
+                print(post.title)
+                self.data.addComment(post.title)
+                iCount = post.upvote_ratio
+                iCount = post.score/iCount #score if definitly true but the upvote ratio might not be
+                iCount *= 100
+                self.data.addLikeCount(int(iCount))
+
+        else:
+            print('in else')
+            for post in sreddit.search(self.topic,sort='top',time_filter='week',limit=100):
+                print(post.title)
+                self.data.addComment(post.title)
+                iCount = post.upvote_ratio
+                iCount = post.score/iCount #score if definitly true but the upvote ratio might not be
+                iCount *= 100
+                self.data.addLikeCount(int(iCount))
+
+        # c in this case is a subreddit obj
+        
             # print("Title: ",submission.title)
             # print("Author: ",submission.author)
             # print("link: ",submission.permalink)
@@ -55,27 +96,29 @@ class redditCrawler(crawler):
             # commentTree = submission.comments
             # print("comment 1",commentTree[0].body)
 
-    def trawler(self, input):
-        # check if there is a related subreddit
-        lst = self.reddit.subreddits.search(input,limit=1)
-        # c in this case is a subreddit obj
-        for c in lst:
-            print(c.display_name)
-            print(c.subscribers)
-            # try:   NEED TO BE A MOD OF THE SUBREDDIT FOR THIS TO WORK
-            #     var1=c.traffic() #var1 is a dict obj' IMPORTANT 
-            #     print(len(var1))
-            #     # varlst = var1["day"] 
-            #     # print(varlst[0])
-            #     # print(varlst[1])
-            #     # print(varlst[2])
-            # except prawcore.NotFound:
-            #     print("not allowed to view trafic")
-        
+
     
     def format(self, block):
         #return data obj
         pass
+
+
+    #notes and extra code
+    # lst = self.reddit.subreddits.search(self.topic,limit=5)
+    #     # c in this case is a subreddit obj
+    #     for c in lst:
+    #         print(c.display_name)
+    #         print(c.subscribers)
+    #         try:   NEED TO BE A MOD OF THE SUBREDDIT FOR THIS TO WORK
+    #             var1=c.traffic() #var1 is a dict obj' IMPORTANT 
+    #             print(len(var1))
+    #             # varlst = var1["day"] 
+    #             # print(varlst[0])
+    #             # print(varlst[1])
+    #             # print(varlst[2])
+    #         except prawcore.NotFound:
+    #             print("not allowed to view trafic")
+    #     return lst
 
 class twitterCrawler(crawler):
 

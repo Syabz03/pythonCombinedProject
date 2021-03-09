@@ -17,7 +17,7 @@ queryLimit = 5
 #api = tweepy.API(auth,wait_on_rate_limit=True) # Creating the API object while passing in auth information
 
 c = redditCrawler()
-c.search("test")
+c.search("HoLoLiVe")
 
 t = twitterCrawler()
 t.search("test")
