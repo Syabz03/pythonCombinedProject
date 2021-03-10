@@ -4,10 +4,14 @@ import prawcore
 from abc import ABC, abstractmethod 
 from mydata import *
 
-class crawler():
-    data =''
+class crawler(ABC):
     topic = ''
+    data = []
 
+    def __init__(self):
+        pass
+
+    @abstractmethod
     def search(self,input):
         self.topic = input
 
@@ -17,6 +21,7 @@ class crawler():
     
 class redditCrawler(crawler):
     reddit=''
+    subRedditPost = []
 
     def __init__(self):
         self.reddit = praw.Reddit(
@@ -33,15 +38,6 @@ class redditCrawler(crawler):
         # i.e. GPU might come up in a escape from tarkov post
         super().search(input)
 
-        #V1
-        for submission in self.reddit.subreddit("all").search(self.topic,'top',limit=1):
-            self.data = Mydata(input)
-            self.data.addComment(submission.title)
-            iCount = submission.upvote_ratio
-            iCount = submission.score/iCount #score if definitly true but the upvote ratio might not be
-            iCount *= 100
-            self.data.addLikeCount(int(iCount))
-
         #V2
         self.topic = input
         multiReddit = self.reddit.subreddits.search(self.topic,limit=5)
@@ -49,42 +45,17 @@ class redditCrawler(crawler):
             print("---------------------------------------------------------------------------------------------------------------")
             print(subr.display_name)
             print(subr.subscribers)
-            self.trawl(subr)
+            try:
+                if self.topic.lower() in str(sreddit.display_name).lower():
+                    print('in if')
+                    self.subRedditPost.append(sreddit.top(time_filter='week',limit=100))
+                else:
+                    print('in else')
+                    self.subRedditPost.append(sreddit.search(self.topic,sort='top',time_filter='week',limit=100))
+            except:
+                print("not allowed to view trafic")
 
-        # c in this case is a subreddit obj
-        # cannot iterate here as the end of the list will be reached
-        # for c in lst:
-        #     print(c.display_name)
-        #     print(c.subscribers)
-
-        print(len(self.data.topComments))
-        return self.data
-
-
-    def trawl(self,sreddit):
-        # check if there is a related subreddit
-        
-        #pseudo 
-        if self.topic.lower() in str(sreddit.display_name).lower():
-            print('in if')
-            for post in sreddit.top(time_filter='week',limit=100):
-                print(post.title)
-                self.data.addComment(post.title)
-                iCount = post.upvote_ratio
-                iCount = post.score/iCount #score if definitly true but the upvote ratio might not be
-                iCount *= 100
-                self.data.addLikeCount(int(iCount))
-
-        else:
-            print('in else')
-            for post in sreddit.search(self.topic,sort='top',time_filter='week',limit=100):
-                print(post.title)
-                self.data.addComment(post.title)
-                iCount = post.upvote_ratio
-                iCount = post.score/iCount #score if definitly true but the upvote ratio might not be
-                iCount *= 100
-                self.data.addLikeCount(int(iCount))
-
+        self.format()
         # c in this case is a subreddit obj
         
             # print("Title: ",submission.title)
@@ -98,12 +69,27 @@ class redditCrawler(crawler):
 
 
     
-    def format(self, block):
+    def format(self):
         #return data obj
-        pass
-
+        #sort here
+        
 
     #notes and extra code
+
+    # for post in sreddit.top(time_filter='week',limit=100):
+    #     print(post.title)
+    #     self.data.addComment(post.title)
+    #     iCount = post.upvote_ratio
+    #     iCount = post.score/iCount #score if definitly true but the upvote ratio might not be
+    #     iCount *= 100
+    #     self.data.addLikeCount(int(iCount))
+
+    # c in this case is a subreddit obj
+    # cannot iterate here as the end of the list will be reached
+    # for c in lst:
+    #     print(c.display_name)
+    #     print(c.subscribers)
+
     # lst = self.reddit.subreddits.search(self.topic,limit=5)
     #     # c in this case is a subreddit obj
     #     for c in lst:
