@@ -42,21 +42,22 @@ class redditCrawler(crawler):
         #V2
         self.topic = input
         multiReddit = self.reddit.subreddits.search(self.topic,limit=5)
-        for subr in multiReddit:
+        for subr in multiReddit:        #get related subreddits
             print("---------------------------------------------------------------------------------------------------------------")
             print(subr.display_name)
             print(subr.subscribers)
             try:
-                if self.topic.lower() in str(sreddit.display_name).lower():
+                if self.topic.lower() in str(subr.display_name).lower():                                        #if subreddit name contains topic
                     print('in if')
-                    self.subRedditPost.append(sreddit.top(time_filter='week',limit=100))
+                    self.subRedditPost.append(subr.top(time_filter='week',limit=100))
                 else:
                     print('in else')
-                    self.subRedditPost.append(sreddit.search(self.topic,sort='top',time_filter='week',limit=100))
-            except:
+                    self.subRedditPost.append(subr.search(self.topic,sort='top',time_filter='week',limit=100))  #if subreddit name does not contains topic
+            except: #supposed to throw specific error but either api or package updated and docs no longer correct
                 print("not allowed to view trafic")
 
         self.format()
+        return self.data
         # c in this case is a subreddit obj
         
             # print("Title: ",submission.title)
@@ -68,11 +69,59 @@ class redditCrawler(crawler):
             # commentTree = submission.comments
             # print("comment 1",commentTree[0].body)
 
-
-    
     def format(self):
-        #return data obj
-        #sort here
+        # 1 week = 604800
+        # 1 day = 86400
+        days,day1,day2,day3,day4,day5,day6,day7 =([] for i in range(8))
+                    #sort into days of the week
+        n=0
+        for postlist in self.subRedditPost:
+            print('mark')
+            try:
+                for submission in postlist:
+                    n += 1
+                    created = submission.created_utc
+                    utcTime = datetime.timestamp(datetime.now())
+                    if created < (utcTime-(6*86400)):
+                        day1.append(submission)
+                    elif created < (utcTime-(5*86400)):
+                        day2.append(submission)
+                    elif created < (utcTime-(4*86400)):
+                        day3.append(submission)
+                    elif created < (utcTime-(3*86400)):
+                        day4.append(submission)
+                    elif created < (utcTime-(2*86400)):
+                        day5.append(submission)
+                    elif created < (utcTime-86400):
+                        day6.append(submission)
+                    else:
+                        day7.append(submission)
+                    print(n)
+            except: #supposed to throw specific error but either api or package updated and docs no longer correct
+                print("not allowed to view trafic")
+        days.append(list(day1)) #oldest
+        days.append(list(day2))
+        days.append(list(day3))
+        days.append(list(day4))
+        days.append(list(day5))
+        days.append(list(day6))
+        days.append(list(day7))
+        
+                    #get data from the day's post
+        for day in days:
+            print(len(day))
+            n=6
+            date = datetime.now() - timedelta(days=n)
+            temp = Mydata(self.topic, 'reddit',date)
+            for post in day:
+                print(post.title)
+                temp.addComment(post.title)
+                iCount = post.upvote_ratio #PLS FIX
+                iCount = post.score/iCount #score if definitly true but the upvote ratio might not be
+                iCount *= 100
+                temp.addLikeCount(int(iCount))
+            self.data.append(temp)
+            n -= 1
         
 
     #notes and extra code
