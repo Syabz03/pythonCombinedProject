@@ -20,7 +20,7 @@ c = redditCrawler()
 c.search("HoLoLiVe")
 
 t = twitterCrawler()
-t.search("test")
+t.search("hololive")
 
 #Reddit
 reddit = praw.Reddit(client_id='PESO3cS0KquaWQ', client_secret='ALSLenkZwZ5WCZ-32MaziUw-O7tmeA', user_agent='VanillaCast')
