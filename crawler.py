@@ -36,7 +36,7 @@ class redditCrawler(crawler):
     def search(self,input):
         #problem is that we are relying on reddit sorting system
         # and unrelated post may come up
-        # i.e. GPU might come up in a escape from tarkov post
+        # i.e. GPU might come up in a escape from tarkov post cause of in game item
         super().search(input)
 
         #V2
@@ -47,13 +47,13 @@ class redditCrawler(crawler):
             print(subr.display_name)
             print(subr.subscribers)
             try:
-                if self.topic.lower() in str(subr.display_name).lower():                                        #if subreddit name contains topic
-                    print('in if')
+                if self.topic.lower() in str(subr.display_name).lower():                                        
+                    print('in if')              #if subreddit name contains topic
                     self.subRedditPost.append(subr.top(time_filter='week',limit=100))
                 else:
-                    print('in else')
-                    self.subRedditPost.append(subr.search(self.topic,sort='top',time_filter='week',limit=100))  #if subreddit name does not contains topic
-            except: #supposed to throw specific error but either api or package updated and docs no longer correct
+                    print('in else')            #if subreddit name does not contains topic
+                    self.subRedditPost.append(subr.search(self.topic,sort='top',time_filter='week',limit=100))  
+            except: #supposed to throw specific error but either api or package updated and provided docs no longer correct
                 print("not allowed to view trafic")
 
         self.format()
@@ -78,7 +78,7 @@ class redditCrawler(crawler):
             print('mark')
             try:
                 for submission in postlist:
-                    created = submission.created_utc
+                    created = submission.created_utc            #sort the crawled post by days in the past week
                     utcTime = datetime.timestamp(datetime.now())
                     if created < (utcTime-(6*86400)):
                         day1.append(submission)
@@ -117,9 +117,9 @@ class redditCrawler(crawler):
             top3 = [0,0,0]
             for post in day:
                 temp.addPost(post.title,post.permalink)
-                iCount = post.upvote_ratio  # PLS FIX
+                iCount = post.upvote_ratio  # get estimated interaction count
                 iCount = iCount - (1-iCount)
-                iCount = post.score / (iCount*100)  # score if definitly true but the upvote ratio might not be
+                iCount = post.score / (iCount*100)  # score if definitly true but the upvote ratio might not be due to reddit obsuring data
                 iCount *= 100
                 temp.addLikeCount(int(iCount))
             self.data.append(temp)
