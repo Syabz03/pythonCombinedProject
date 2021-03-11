@@ -13,8 +13,8 @@ class Mydata:
         self.interactionCount = 0
         self.commentCount =0
     
-    def addComment(self,comment):
-        self.topComments.append(comment)
+    def addPost(self,text,url):
+        self.topComments.append(Post(text,url))
 
     def addLikeCount(self,like):
         self.interactionCount += like
@@ -22,4 +22,12 @@ class Mydata:
     def addCommentCount(self,count):
         self.commentCount += count
         
-        
+class Post:
+    
+    text = ''
+    url =''
+
+    def __init__(self,text, url):
+        self.text = text
+        self.url = url
+
