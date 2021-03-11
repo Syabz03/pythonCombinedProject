@@ -16,7 +16,7 @@ class crawler(ABC):
     def search(self,input):
         self.topic = input
 
-    def format(self, block):
+    def format(self):
         pass
 
     
@@ -72,14 +72,12 @@ class redditCrawler(crawler):
     def format(self):
         # 1 week = 604800
         # 1 day = 86400
-        days,day1,day2,day3,day4,day5,day6,day7 =([] for i in range(8))
-                    #sort into days of the week
-        n=0
+        days, day1, day2, day3, day4, day5, day6, day7 = ([] for i in range(8))
+        #sort into days of the week
         for postlist in self.subRedditPost:
             print('mark')
             try:
                 for submission in postlist:
-                    n += 1
                     created = submission.created_utc
                     utcTime = datetime.timestamp(datetime.now())
                     if created < (utcTime-(6*86400)):
@@ -96,33 +94,38 @@ class redditCrawler(crawler):
                         day6.append(submission)
                     else:
                         day7.append(submission)
-                    print(n)
-            except: #supposed to throw specific error but either api or package updated and docs no longer correct
+            except:  # supposed to throw specific error but either api or package updated and docs no longer correct
                 print("not allowed to view trafic")
-        days.append(list(day1)) #oldest
+        days.append(list(day1))  # oldest
         days.append(list(day2))
         days.append(list(day3))
         days.append(list(day4))
         days.append(list(day5))
         days.append(list(day6))
         days.append(list(day7))
-        
-                    #get data from the day's post
+        n =0
+        for d in days:
+            n = n+len(d)
+        print(n," post crawled")
+
+        #get data from the day's post
         for day in days:
             print(len(day))
-            n=6
+            n = 6
             date = datetime.now() - timedelta(days=n)
-            temp = Mydata(self.topic, 'reddit',date)
+            temp = Mydata(self.topic, 'reddit', date)
+            top3 = [0,0,0]
             for post in day:
-                print(post.title)
-                temp.addComment(post.title)
-                iCount = post.upvote_ratio #PLS FIX
-                iCount = post.score/iCount #score if definitly true but the upvote ratio might not be
+                temp.addPost(post.title,post.permalink)
+                iCount = post.upvote_ratio  # PLS FIX
+                iCount = iCount - (1-iCount)
+                iCount = post.score / (iCount*100)  # score if definitly true but the upvote ratio might not be
                 iCount *= 100
                 temp.addLikeCount(int(iCount))
             self.data.append(temp)
             n -= 1
-        
+
+
 
     #notes and extra code
 
