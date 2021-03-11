@@ -172,12 +172,7 @@ class twitterCrawler(crawler):
 
     def search(self,input):
         
-        #self.data = Mydata(input)
-
-        # Temp variables to hold everything, change when needed
-        tweets = []
-        total_likes = []
-        total_retweets = []
+        self.topic = input
 
         tweet_limit = 50
 
@@ -185,40 +180,51 @@ class twitterCrawler(crawler):
         # The until tag returns tweets created before the given date. I.e. -1 for today, 6 for 6 days before (Total 7 days)
         for n in range(-1, 6):
             day = datetime.now() - timedelta(days=n)
-            results = self.api.search(q=f"{input} -filter:retweets", result_type="mixed", count=tweet_limit, until=day.strftime("%Y-%m-%d")) # Find tweets for that day
+            results = self.api.search(q=f"{input} -filter:replies -filter:retweets", result_type="mixed", count=tweet_limit, until=day.strftime("%Y-%m-%d")) # Find tweets for that day
             
-            likes = 0
-            retweets = 0
-
-            # Go through tweets 
-            for tweet in results:
-                tweets.append(tweet.text)
-                likes += tweet.favorite_count
-                #print(tweet.text + "\n" + str(tweet.favorite_count) + "\n\n")
-                retweets += tweet.retweet_count
-            
-            total_likes.append(likes)
-            total_retweets.append(retweets)
-
-        #30-50 tweets per day
-        #Get top tweets and combine the interaction data into 1 number for 1 day
+            self.format(results, day)
 
         # Temp tweet print function
-        print("\n========================================Twitter Result===========================================\n")
+        #print("\n========================================Twitter Result===========================================\n")
+        #
+        #for n in range(0, 7):
+        #    
+        #    print(f"Day {n+1})\n")
+        #
+        #    #for i in range(tweet_limit):
+        #    #    
+        #    #    print(self.data[n].topComments[i].text)
+        #    #    print(self.data[n].topComments[i].url)
+        #    #    print()
+        #    
+        #    print("Total retweets: " + str(self.data[n].commentCount))
+        #    print("Total likes: " + str(self.data[n].interactionCount))
+        #    print()
+
+        return self.data
+
+    def format(self, block, day):
         
-        for n in range(0, 7):
-            
-            print(f"Day {n+1})\n")
+        super().format(block)
 
-            #for i in range(tweet_limit):
-            #    
-            #    print(str(i + n*(tweet_limit) + 1) + ")\n" + tweets[i + n*(tweet_limit)] + "\n")
-            
-            print("Total retweets: " + str(total_retweets[n]))
-            print("Total likes: " + str(total_likes[n]))
-            print()
+        temp = Mydata(self.topic, 'Twitter', day)
 
-        #return results
+        # Go through tweets and combine the interaction data into 1 number for 1 day
+        for tweet in block:
 
-    def format(self, block):
-        return super().format(block)
+            url = f"https://twitter.com/i/web/status/{tweet.id}"
+            temp.addPost(tweet.text, url)
+
+            #print(tweet.text)
+            #print(f"https://twitter.com/i/web/status/{tweet.id}")
+
+            temp.addLikeCount(tweet.favorite_count) 
+            temp.addCommentCount(tweet.retweet_count)
+
+        self.data.append(temp)
+        
+        #Get top 3 post for day
+        #Get url
+
+
+
