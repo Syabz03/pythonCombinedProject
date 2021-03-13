@@ -36,6 +36,7 @@ class dataExport(retrieval):
     def exportData(self,data):
         data_temp = []
         posts_temp = []
+        ids = []
 
         # Creating directory and file
         p = Path(self.path)
@@ -53,6 +54,15 @@ class dataExport(retrieval):
         if not check_d_file.is_file(): self.write_json(data_temp, data_file)
         if not check_p_file.is_file(): self.write_json(data_temp, posts_file)
 
+        with open(posts_file, 'r') as json_file:
+            try:
+                cur_data = json.load(json_file)
+                posts_temp = cur_data
+                for id in posts_temp: ids.append(id['id'])
+            except Exception as e:
+                print('Exception: ' + str(e))
+
+        id = set(ids)
         for submission in data:
             to_dict = vars(submission)
             d_date = dp.parse(str(to_dict['date']))
@@ -64,7 +74,7 @@ class dataExport(retrieval):
                 p_date = dp.parse(str(posts_dict['date']))
                 posts_dict['date'] = str(p_date)
 
-                if source.lower() in posts_dict['url'].lower():
+                if source.lower() in posts_dict['url'].lower() and posts_dict['id'] not in id:
                     #print("found " + source)
                     posts_temp.append(posts_dict)
 
@@ -86,7 +96,6 @@ class dataExport(retrieval):
 
         with open(file_name, 'r') as json_file:
             ids = []
-
             try:
                 data = json.load(json_file)
                 temp = data
