@@ -57,6 +57,7 @@ class redditCrawler(crawler):
                 print("not allowed to view trafic")
 
         self.format()
+
         return self.data
         # c in this case is a subreddit obj
         
@@ -116,7 +117,8 @@ class redditCrawler(crawler):
             temp = Mydata(self.topic, 'reddit', date)
             top3 = [0,0,0]
             for post in day:
-                temp.addPost(post.title,post.permalink)
+                url = 'reddit.com'+post.permalink
+                temp.addPost(post.title,post.id,url,post.created_utc)
                 iCount = post.upvote_ratio  # get estimated interaction count
                 iCount = iCount - (1-iCount)
                 iCount = post.score / (iCount*100)  # score if definitly true but the upvote ratio might not be due to reddit obsuring data
@@ -174,7 +176,7 @@ class twitterCrawler(crawler):
         self.api = tweepy.API(self.auth, wait_on_rate_limit=True) # Creating the API object while passing in auth information
 
     def search(self,input):
-        
+        self.data = [] #empty data
         self.topic = input
 
         tweet_limit = 50
@@ -203,12 +205,10 @@ class twitterCrawler(crawler):
         #    print("Total retweets: " + str(self.data[n].commentCount))
         #    print("Total likes: " + str(self.data[n].interactionCount))
         #    print()
-
         return self.data
 
     def format(self, block, day):
-        
-        super().format(block)
+        #super().format(block)
 
         temp = Mydata(self.topic, 'Twitter', day)
 
@@ -216,16 +216,15 @@ class twitterCrawler(crawler):
         for tweet in block:
 
             url = f"https://twitter.com/i/web/status/{tweet.id}"
-            temp.addPost(tweet.text, url)
+            temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
 
             #print(tweet.text)
             #print(f"https://twitter.com/i/web/status/{tweet.id}")
 
-            temp.addLikeCount(tweet.favorite_count) 
+            temp.addLikeCount(tweet.favorite_count)
             temp.addCommentCount(tweet.retweet_count)
 
         self.data.append(temp)
-        
         #Get top 3 post for day
         #Get url
 

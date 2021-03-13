@@ -13,21 +13,28 @@ class Mydata:
         self.interactionCount = 0
         self.commentCount =0
     
-    def addPost(self,text,url):
-        self.topComments.append(Post(text,url))
+    def addPost(self,text,id,url,date):
+        self.topComments.append(Post(text,id,url,date))
 
     def addLikeCount(self,like):
         self.interactionCount += like
     
     def addCommentCount(self,count):
         self.commentCount += count
-        
+
+    def getTopComments(self):
+        return self.topComments
+
 class Post:
     
     text = ''
+    id = ''
     url =''
+    date = ''
 
-    def __init__(self,text, url):
+    def __init__(self, text, id, url, date):
         self.text = text
+        self.id = id
         self.url = url
+        self.date = date
 

@@ -3,6 +3,7 @@ import tweepy
 import praw
 #from mydata import *
 from crawler import *
+from JSONExport import *
 
 queryLimit = 5
 
@@ -17,10 +18,13 @@ queryLimit = 5
 #api = tweepy.API(auth,wait_on_rate_limit=True) # Creating the API object while passing in auth information
 
 c = redditCrawler()
-c.search("HoLoLiVe")
+rdata = c.search("HoLoLiVe")
+de = dataExport()
+de.exportData(rdata)
 
 t = twitterCrawler()
-t.search("hololive")
+tdata = t.search("hololive")
+de.exportData(tdata)
 
 #Reddit
 reddit = praw.Reddit(client_id='PESO3cS0KquaWQ', client_secret='ALSLenkZwZ5WCZ-32MaziUw-O7tmeA', user_agent='VanillaCast')
@@ -88,11 +92,11 @@ if __name__ == '__main__':
     tk.Button(master=window, text='Quit', command=window.quit) \
         .grid(row=0, column=3, sticky=tk.W)
 
-    tab_parent = tk.Notebook(window)
-    tab1 = tk.Frame(tab_parent)
-    tab2 = tk.Frame(tab_parent)
-    tab_parent.add(tab1, text="All Records")
-    tab_parent.add(tab2, text="Add New Record")
+    #tab_parent = tk.Notebook(window)
+    #tab1 = tk.Frame(tab_parent)
+    #tab2 = tk.Frame(tab_parent)
+    #tab_parent.add(tab1, text="All Records")
+    #tab_parent.add(tab2, text="Add New Record")
 
     window.mainloop()
     
