@@ -1,18 +1,28 @@
-from unittest import TestCase
+import unittest
+from crawler import *
 
-class Testcrawler(TestCase):
+class Testcrawler(unittest.TestCase):
     pass
 
-class TestredditCrawler(TestCase):
+class TestredditCrawler(unittest.TestCase):
     def test_search(self):
-        self.fail()
+        i = redditCrawler()
+        dat = i.search('feng shui')
 
-    def test_format(self):
-        self.fail()
+        self.assertEqual(len(dat),7)
+        count = 0
+        for day in dat:
+            count += day.interactionCount
 
-class TesttwitterCrawler(TestCase):
-    def test_search(self):
-        self.fail()
+        self.assertGreater(count,0)
+        #self.fail() #use when case fails
 
-    def test_format(self):
-        self.fail()
+# class TesttwitterCrawler(unittest.TestCase):
+#     def test_search(self):
+#         self.fail()
+
+#     def test_format(self):
+#         self.fail()
+
+if __name__ == '__main__':
+    unittest.main()
