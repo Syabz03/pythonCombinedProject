@@ -22,10 +22,11 @@ class retrieval:
 
 
 class dataExport(retrieval):
-    path = "data/"
     # Creating directory 'data' for saving JSON files
+    path = "data/"
     p = Path(path)
     p.mkdir(parents=True, exist_ok=True)
+
     # Seach History file 
     searchHist_file = path + "user_search_hist.json"
     check_hist_file = Path(searchHist_file)
@@ -38,7 +39,7 @@ class dataExport(retrieval):
         with open(filename, 'w') as f:
             json.dump(data, f)
     
-    # Function to get user's search history to show on UI
+    # Function to get user's search history from file to show on UI
     def getSearchHist(self):
         hist_temp = {}
         hist_arr = []
@@ -54,32 +55,18 @@ class dataExport(retrieval):
                     print('Get Search History - Exception: ' + str(e))
             
         elif not self.check_hist_file.is_file(): 
-            print("Search History file does not exist, creating temp... ")
-            self.write_json(hist_temp, self.searchHist_file) #create empty file before adding search query
+            print("No Search History ")
+            self.write_json(hist_temp, self.searchHist_file) # Create empty file for future use since does not exist
         
-        return hist_arr
+        return hist_arr # Return search history from file 
 
     # Function to save user's search query to JSON file
-    def addSearchHist(self, query): #add current search query to data file for future reference
-        print("query: ", query)
+    def addSearchHist(self, queryList): # Add current search query to data file for future reference
         hist_temp = {}
-        hist_arr = []
+        hist_temp['search'] = queryList # Insert list of query from Search History text box to hist_temp dictionary
+        self.write_json(hist_temp, self.searchHist_file) # Call write_json function to store items in hist_temp to specified file
 
-        with open(self.check_hist_file, 'r') as json_file:
-            try:
-                cur_data = json.load(json_file)
-                hist_temp = cur_data
-                if hist_temp: hist_arr = hist_temp['search']
-                
-                hist_arr.append(query.capitalize())
-                
-                hist_temp['search'] = hist_arr
-            except Exception as e:
-                print('Add Search History - Exception: ' + str(e))
-        
-        self.write_json(hist_temp, self.searchHist_file)
-
-    #save data to file, according to source
+    # Save data to file, according to source (Reddit or Twitter)
     def exportData(self,data):
         data_temp = []
         posts_temp = []
@@ -98,8 +85,8 @@ class dataExport(retrieval):
         # check if file exists
         check_d_file = Path(data_file)
         check_p_file = Path(posts_file)
-        # if not check_d_file.is_file(): self.write_json(data_temp, data_file)
-        # if not check_p_file.is_file(): self.write_json(data_temp, posts_file)
+        if not check_d_file.is_file(): self.write_json(data_temp, data_file)
+        if not check_p_file.is_file(): self.write_json(data_temp, posts_file)
 
         with open(posts_file, 'r') as json_file:
             try:
@@ -128,31 +115,31 @@ class dataExport(retrieval):
             if source.lower() == to_dict['source'].lower():
                 data_temp.append(to_dict)
         
-        self.combinedData(data, source, id)
-        #self.write_json(posts_temp, posts_file)
-        #self.write_json(data_temp, data_file)
+        #self.combinedData(data, source, id)
+        self.write_json(posts_temp, posts_file)
+        self.write_json(data_temp, data_file)
 
-    def combinedData(self, data, source, id):
-        for submission in data:
-            to_dict = vars(submission)
-            d_date = dp.parse(str(to_dict['date']))
-            to_dict['date'] = str(d_date)
-            to_dict['top_comments'] = {}
+    # def combinedData(self, data, source, id):
+    #     for submission in data:
+    #         to_dict = vars(submission)
+    #         d_date = dp.parse(str(to_dict['date']))
+    #         to_dict['date'] = str(d_date)
+    #         to_dict['top_comments'] = {}
 
-            tc = submission.getTopComments()
-            for posts in tc:
-                posts_dict = vars(posts)
-                p_date = dp.parse(str(posts_dict['date']))
-                posts_dict['date'] = str(p_date)
-                top_comments = {}
+    #         tc = submission.getTopComments()
+    #         for posts in tc:
+    #             posts_dict = vars(posts)
+    #             p_date = dp.parse(str(posts_dict['date']))
+    #             posts_dict['date'] = str(p_date)
+    #             top_comments = {}
 
-                if source.lower() in posts_dict['url'].lower() and posts_dict['id'] not in id:
-                    #print("found " + source)
-                    #posts_temp.append(posts_dict)
-                    top_comments.update(posts_dict)
+    #             if source.lower() in posts_dict['url'].lower() and posts_dict['id'] not in id:
+    #                 #print("found " + source)
+    #                 #posts_temp.append(posts_dict)
+    #                 top_comments.update(posts_dict)
                 
-                to_dict['top_comments'] = top_comments
-            print(to_dict['top_comments'])
+    #             to_dict['top_comments'] = top_comments
+    #         print(to_dict['top_comments'])
 
-            #if source.lower() == to_dict['source'].lower():
-                #data_temp.append(to_dict)
+    #         #if source.lower() == to_dict['source'].lower():
+    #             #data_temp.append(to_dict)

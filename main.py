@@ -139,7 +139,6 @@ def show_entry_fields(self):
         self.txtTwitter.delete("1.0", 'end')
 
     queryVal = self.txtSearch.get() #"Query: %s" % (self.txtSearch.get())
-    self.txtSearchHistory.insert(tk.END, queryVal.capitalize() + "\n")
     self.txtTwitter.insert(tk.END, queryVal)
 
     #query = e1.get() + " -filter:retweets" # The search term you want to find
@@ -156,7 +155,7 @@ def show_entry_fields(self):
     #    e3.insert(tk.END, "\n------------------------------------------------")
 
     redditCrawl(self)
-    saveQuery(self,queryVal)
+    saveQuery(self, queryVal)
 
 def redditCrawl(self):
     str3Val = self.txtReddit.get("1.0", 'end')
@@ -187,10 +186,31 @@ def showSearchHistory(self):
     if hist:
         for items in hist:
             field.insert(tk.END, items + "\n")
+    field.config(state='disabled')
 
 def saveQuery(self, query):
-    de = dataExport()
-    de.addSearchHist(query)
+    items_temp = []
+    field = self.txtSearchHistory # Initialise Search History textbox as 'field'
+    field.config(state='normal') # Enable 'field' for editing (removing and adding texts)
+    index = 1
 
+    # Iterate through 'field' to check if query made matches previous searches
+    for item in field.get("1.0", 'end').splitlines():
+        if item: 
+            if str(item).lower() == query.lower():
+                field.delete(str(index) + '.0', str(index) + '.end + 1 char') # Remove text from 'field' if matches with current query
+        index += 1
+
+    self.txtSearchHistory.insert('1.0', query.capitalize() + "\n") #Insert current query to first line of 'field'
+    field.config(state='disabled') # Disable user from changing 'field' text box
+    
+    # Get updated search history to store in file
+    for item in field.get("1.0", 'end').splitlines():
+        if item: items_temp.append(item)
+
+    # Store queries (past and current) to file
+    de = dataExport()
+    de.addSearchHist(items_temp)
+    
 if __name__ == '__main__':
     vp_start_gui()
