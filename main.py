@@ -1,10 +1,12 @@
 import tkinter as tk
+import tkinter.ttk as ttk
 import tweepy
 import praw
 #from mydata import *
 from crawler import *
 from JSONExport import *
-
+import sys
+import myPage_support
 queryLimit = 5
 
 #Twitter
@@ -17,26 +19,124 @@ queryLimit = 5
 #auth.set_access_token(access_token, access_token_secret) # Setting your access token and secret
 #api = tweepy.API(auth,wait_on_rate_limit=True) # Creating the API object while passing in auth information
 
-c = redditCrawler()
-rdata = c.search("HoLoLiVe")
-de = dataExport()
-de.exportData(rdata)
+# c = redditCrawler()
+# rdata = c.search("HoLoLiVe")
+# de = dataExport()
+# de.exportData(rdata)
+#
+# t = twitterCrawler()
+# tdata = t.search("hololive")
+# de.exportData(tdata)
 
-t = twitterCrawler()
-tdata = t.search("hololive")
-de.exportData(tdata)
+#START OF GUI
+def vp_start_gui():
+    '''Starting point when module is the main routine.'''
+    global val, w, root
+    root = tk.Tk()
+    top = Toplevel1 (root)
+    myPage_support.init(root, top)
+    root.mainloop()
+w = None
+def create_Toplevel1(rt, *args, **kwargs):
+    '''Starting point when module is imported by another module.
+       Correct form of call: 'create_Toplevel1(root, *args, **kwargs)' .'''
+    global w, w_win, root
+    #rt = root
+    root = rt
+    w = tk.Toplevel (root)
+    top = Toplevel1 (w)
+    myPage_support.init(w, top, *args, **kwargs)
+    return (w, top)
+
+def destroy_Toplevel1():
+    global w
+    w.destroy()
+    w = None
+
+class Toplevel1:
+    def __init__(self, top=None):
+        '''This class configures and populates the toplevel window.
+           top is the toplevel containing window.'''
+        _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
+        _fgcolor = '#000000'  # X11 color: 'black'
+        _compcolor = '#d9d9d9' # X11 color: 'gray85'
+        _ana1color = '#d9d9d9' # X11 color: 'gray85'
+        _ana2color = '#ececec' # Closest X11 color: 'gray92'
+
+        top.geometry("821x540+695+284")
+        top.minsize(120, 1)
+        top.maxsize(1924, 1061)
+        top.resizable(1,  1)
+        top.title("VanillaCast Web Crawler")
+        top.configure(background="#f4efe3", highlightbackground="#d9d9d9", highlightcolor="black")
+
+        self.txtSearchHistory = tk.Text(top)
+        self.txtSearchHistory.place(relx=0.012, rely=0.278, relheight=0.631, relwidth=0.185)
+        self.txtSearchHistory.configure(background="white", font="TkTextFont", foreground="black", highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black", selectbackground="blue", selectforeground="white", wrap="word")
+        self.Label1 = tk.Label(top)
+        self.Label1.place(relx=0.012, rely=0.222, height=25, width=142)
+        self.Label1.configure(activebackground="#f9f9f9", activeforeground="black", background="#f4efe3", font="-family {Segoe UI Black} -size 10 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", text='''Search History''')
+
+        self.txtInterCount = tk.Text(top)
+        self.txtInterCount.place(relx=0.219, rely=0.296, relheight=0.143, relwidth=0.357)
+        self.txtInterCount.configure(background="white", font="TkTextFont", foreground="black", highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black", wrap="word")
+
+        self.graphCanvas = tk.Canvas(top)
+        self.graphCanvas.place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
+        self.graphCanvas.configure(background="#ffffff", borderwidth="2", highlightbackground="#f2f0ce", highlightcolor="black", insertbackground="black", relief="ridge", selectbackground="blue", selectforeground="white")
+
+        self.txtReddit = tk.Text(top)
+        self.txtReddit.place(relx=0.597, rely=0.093, relheight=0.35, relwidth=0.39)
+        self.txtReddit.configure(background="white",font="TkTextFont",foreground="black",highlightbackground="#d9d9d9",highlightcolor="black",insertbackground="black",selectbackground="blue",selectforeground="white",wrap="word")
+
+        self.txtTwitter = tk.Text(top)
+        self.txtTwitter.place(relx=0.597, rely=0.519, relheight=0.389, relwidth=0.39)
+        self.txtTwitter.configure(background="white",font="TkTextFont",foreground="black",highlightbackground="#d9d9d9",highlightcolor="black",insertbackground="black",selectbackground="blue",selectforeground="white",wrap="word")
+
+        self.Label2 = tk.Label(top)
+        self.Label2.place(relx=0.28, rely=0.241, height=25, width=197)
+        self.Label2.configure(activebackground="#f9f9f9",activeforeground="black",background="#f4efe3",disabledforeground="#a3a3a3",font="-family {Segoe UI Black} -size 10 -weight bold",foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black",text='''Interaction Count''')
+
+        self.Label3 = tk.Label(top)
+        self.Label3.place(relx=0.592, rely=0.044, height=25, width=327)
+        self.Label3.configure(activebackground="#f9f9f9",activeforeground="black",background="#ffa4a4",disabledforeground="#a3a3a3",font="-family {Segoe UI Black} -size 10 -weight bold",foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black",text='''Reddit''')
+
+        self.Label4 = tk.Label(top)
+        self.Label4.place(relx=0.597, rely=0.463, height=25, width=317)
+        self.Label4.configure(activebackground="#f9f9f9",activeforeground="black",background="#e3f8fb",disabledforeground="#a3a3a3",font="-family {Segoe UI Black} -size 10 -weight bold",foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black",text='''Twitter''')
+
+        self.Label5 = tk.Label(top)
+        self.Label5.place(relx=0.341, rely=0.463, height=25, width=88)
+        self.Label5.configure(activebackground="#f9f9f9",activeforeground="black",background="#f4efe3",disabledforeground="#a3a3a3",font="-family {Segoe UI Black} -size 10 -weight bold",foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black",text='''Graph''')
+
+        self.txtSearch = tk.Entry(top)
+        self.txtSearch.place(relx=0.012, rely=0.019, relheight=0.076, relwidth=0.403)
+
+        self.btnSearch = tk.Button(top)
+        self.btnSearch.place(relx=0.426, rely=0.019, height=44, width=87)
+        self.btnSearch.configure(activebackground="#fafeda",activeforeground="#000000",background="#f4ecbd",disabledforeground="#a3a3a3",font="-family {Segoe UI Black} -size 10 -weight bold",foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black",pady="0",text='''Search''')
+
+        self.btnQuit = tk.Button(top)
+        self.btnQuit.place(relx=0.914, rely=0.926, height=24, width=47)
+        self.btnQuit.configure(activebackground="#ececec",activeforeground="#000000",background="#f2bfcd",disabledforeground="#a3a3a3",font="-family {Segoe UI Black} -size 10 -weight bold",foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black",pady="0",text='''Quit''')
+
+        self.menubar = tk.Menu(top,font="TkMenuFont",bg=_bgcolor,fg=_fgcolor)
+        top.configure(menu = self.menubar)
+
+        self.btnSearch.configure(command=lambda:show_entry_fields(self))
+        self.btnQuit.configure(command=root.quit)
+#END OF GUI
 
 #Reddit
 reddit = praw.Reddit(client_id='PESO3cS0KquaWQ', client_secret='ALSLenkZwZ5WCZ-32MaziUw-O7tmeA', user_agent='VanillaCast')
 
-def show_entry_fields():
-    strVal = e3.get("1.0",'end')
+def show_entry_fields(self):
+    strVal = self.txtTwitter.get("1.0", 'end')
     if (strVal.strip()):
-        e3.delete("1.0",'end')
+        self.txtTwitter.delete("1.0", 'end')
 
-    val = "Query: %s" % (e1.get())
-    e3.insert(tk.END, val)
-
+    val = "Query: %s" % (self.txtSearch.get())
+    self.txtTwitter.insert(tk.END, val)
     #query = e1.get() + " -filter:retweets" # The search term you want to find
     #language = "en" #language
     #results = api.search(q=query, lang=language, rpp=queryLimit) #initiate API call
@@ -50,89 +150,25 @@ def show_entry_fields():
     #    e3.insert(tk.END, tweet.text)
     #    e3.insert(tk.END, "\n------------------------------------------------")
 
-    redditCrawl()
+    redditCrawl(self)
 
-def redditCrawl():
-    str3Val = e4.get("1.0", 'end')
+def redditCrawl(self):
+    str3Val = self.txtReddit.get("1.0", 'end')
     if (str3Val.strip()):
-        e4.delete("1.0", 'end')
+        self.txtReddit.delete("1.0", 'end')
 
-    ml_subreddit = reddit.subreddit(e1.get())
+    ml_subreddit = reddit.subreddit(self.txtSearch.get())
 
     for post in ml_subreddit.hot(limit=queryLimit):
-        e4.insert(tk.END, "\n\n")
-        e4.insert(tk.END, "SubReddit: " + str(post.author))
-        e4.insert(tk.END, "\n")
-        e4.insert(tk.END, "Posted: \n")
-        e4.insert(tk.END, post.title)
-        e4.insert(tk.END, "\n")
-        e4.insert(tk.END, "Description: \n")
-        e4.insert(tk.END, post.selftext)
-        e4.insert(tk.END, "\n------------------------------------------------")
+        self.txtReddit.insert(tk.END, "\n\n")
+        self.txtReddit.insert(tk.END, "SubReddit: " + str(post.author))
+        self.txtReddit.insert(tk.END, "\n")
+        self.txtReddit.insert(tk.END, "Posted: \n")
+        self.txtReddit.insert(tk.END, post.title)
+        self.txtReddit.insert(tk.END, "\n")
+        self.txtReddit.insert(tk.END, "Description: \n")
+        self.txtReddit.insert(tk.END, post.selftext)
+        self.txtReddit.insert(tk.END, "\n------------------------------------------------")
 
 if __name__ == '__main__':
-
-    window = tk.Tk()
-    window.title("Crawler GUI")
-
-    tk.Label(master=window, text="Query").grid(row=0)
-    tk.Label(master=window, text="Twitter").grid(row=1, column=0, columnspan=2)
-    tk.Label(master=window, text="Reddit").grid(row=1, column=2, columnspan=2)
-
-    e1 = tk.Entry(window)
-    e3 = tk.Text(window, width=50, height=30)
-    e4 = tk.Text(window, width=50, height=30)
-
-    e1.grid(row=0, column=1)
-    e3.grid(row=2, column=0, columnspan=2, sticky=tk.W + tk.E)
-    e4.grid(row=2, column=2, columnspan=2, sticky=tk.W + tk.E)
-
-    tk.Button(master=window, text='Show', command=show_entry_fields) \
-        .grid(row=0, column=2, sticky=tk.W)
-    tk.Button(master=window, text='Quit', command=window.quit) \
-        .grid(row=0, column=3, sticky=tk.W)
-
-    #tab_parent = tk.Notebook(window)
-    #tab1 = tk.Frame(tab_parent)
-    #tab2 = tk.Frame(tab_parent)
-    #tab_parent.add(tab1, text="All Records")
-    #tab_parent.add(tab2, text="Add New Record")
-
-    window.mainloop()
-    
-    
-
-
-# 
-# Height = 720
-# WIDTH = 1280
-# 
-# def crawl_web():
-#     print("Button Clicked")
-# 
-# root = GUI.Tk()
-# 
-# canvas = GUI.Canvas(root, height=Height, width=WIDTH)
-# canvas.pack()
-# 
-# background_image = GUI.PhotoImage(file='office_chi.png')
-# background_label = GUI.Label(root, image=background_image)
-# background_label.place(relwidth=1, relheight=1)
-# 
-# frame = GUI.Frame(root, bg='#80c1ff', bd=5)
-# frame.place(relx=0.5, rely=0.1, relwidth=0.75, relheight=0.1, anchor='n')
-# 
-# entry = GUI.Entry(frame, font=42)
-# entry.place(relwidth=0.65, relheight=1)
-# 
-# button = GUI.Button(frame, text="Search!", font=42)
-# button.place(relx=0.7, relheight=1, relwidth=0.25)
-# 
-# lower_frame = GUI.Frame(root, bg='#80c1ff', bd=5)
-# lower_frame.place(relx=0.5, rely=0.25, relwidth=0.75, relheight=0.6, anchor='n')
-# 
-# label = GUI.Label(lower_frame, text="This is a label")
-# label.place(relwidth=1, relheight=1)
-# 
-# 
-# root.mainloop()
+    vp_start_gui()
