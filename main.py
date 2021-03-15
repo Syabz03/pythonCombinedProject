@@ -125,6 +125,9 @@ class Toplevel1:
 
         self.btnSearch.configure(command=lambda:show_entry_fields(self))
         self.btnQuit.configure(command=root.quit)
+
+        showSearchHistory(self)
+
 #END OF GUI
 
 #Reddit
@@ -135,8 +138,10 @@ def show_entry_fields(self):
     if (strVal.strip()):
         self.txtTwitter.delete("1.0", 'end')
 
-    val = "Query: %s" % (self.txtSearch.get())
-    self.txtTwitter.insert(tk.END, val)
+    queryVal = self.txtSearch.get() #"Query: %s" % (self.txtSearch.get())
+    self.txtSearchHistory.insert(tk.END, queryVal.capitalize() + "\n")
+    self.txtTwitter.insert(tk.END, queryVal)
+
     #query = e1.get() + " -filter:retweets" # The search term you want to find
     #language = "en" #language
     #results = api.search(q=query, lang=language, rpp=queryLimit) #initiate API call
@@ -151,6 +156,7 @@ def show_entry_fields(self):
     #    e3.insert(tk.END, "\n------------------------------------------------")
 
     redditCrawl(self)
+    saveQuery(self,queryVal)
 
 def redditCrawl(self):
     str3Val = self.txtReddit.get("1.0", 'end')
@@ -169,6 +175,22 @@ def redditCrawl(self):
         self.txtReddit.insert(tk.END, "Description: \n")
         self.txtReddit.insert(tk.END, post.selftext)
         self.txtReddit.insert(tk.END, "\n------------------------------------------------")
+
+def showSearchHistory(self):
+    field = self.txtSearchHistory
+    de = dataExport()
+    hist = de.getSearchHist()
+
+    strVal = field.get("1.0", 'end')
+    if (strVal.strip()): field.delete("1.0", 'end')
+    
+    if hist:
+        for items in hist:
+            field.insert(tk.END, items + "\n")
+
+def saveQuery(self, query):
+    de = dataExport()
+    de.addSearchHist(query)
 
 if __name__ == '__main__':
     vp_start_gui()

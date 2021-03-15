@@ -16,18 +16,68 @@ class retrieval:
     
     def combinedData(self, data):
         pass
+    
+    def searchHist(self, query):
+        pass
 
 
 class dataExport(retrieval):
     path = "data/"
+    # Creating directory 'data' for saving JSON files
+    p = Path(path)
+    p.mkdir(parents=True, exist_ok=True)
+    # Seach History file 
+    searchHist_file = path + "user_search_hist.json"
+    check_hist_file = Path(searchHist_file)
 
     def __init__(self):
         pass
 
-    # function to add to JSON
+    # Function to add to JSON
     def write_json(self, data, filename):
         with open(filename, 'w') as f:
             json.dump(data, f)
+    
+    # Function to get user's search history to show on UI
+    def getSearchHist(self):
+        hist_temp = {}
+        hist_arr = []
+        
+        if self.check_hist_file.is_file():
+            with open(self.check_hist_file, 'r') as json_file:
+                try:
+                    cur_data = json.load(json_file)
+                    hist_temp = cur_data
+                    if hist_temp: hist_arr = hist_temp['search']
+
+                except Exception as e:
+                    print('Get Search History - Exception: ' + str(e))
+            
+        elif not self.check_hist_file.is_file(): 
+            print("Search History file does not exist, creating temp... ")
+            self.write_json(hist_temp, self.searchHist_file) #create empty file before adding search query
+        
+        return hist_arr
+
+    # Function to save user's search query to JSON file
+    def addSearchHist(self, query): #add current search query to data file for future reference
+        print("query: ", query)
+        hist_temp = {}
+        hist_arr = []
+
+        with open(self.check_hist_file, 'r') as json_file:
+            try:
+                cur_data = json.load(json_file)
+                hist_temp = cur_data
+                if hist_temp: hist_arr = hist_temp['search']
+                
+                hist_arr.append(query.capitalize())
+                
+                hist_temp['search'] = hist_arr
+            except Exception as e:
+                print('Add Search History - Exception: ' + str(e))
+        
+        self.write_json(hist_temp, self.searchHist_file)
 
     #save data to file, according to source
     def exportData(self,data):
@@ -39,10 +89,10 @@ class dataExport(retrieval):
         p = Path(self.path)
         p.mkdir(parents=True, exist_ok=True)
 
-        topic = str(data[0].topic)
-        source = str(data[0].source)
-        print(topic, source)
-        data_file = self.path + topic + "_" + source + "_data.json"
+        topic = str(data[0].topic) # get the topic the user searched for 
+        source = str(data[0].source) # get the source (either reddit or twitter)
+        print(topic, source) # print for verification
+        data_file = self.path + topic + "_" + source + "_data.json" 
         posts_file = self.path + topic + "_" + source + "_posts.json"
 
         # check if file exists
