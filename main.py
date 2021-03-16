@@ -168,48 +168,68 @@ class Toplevel1:
 reddit = praw.Reddit(client_id='PESO3cS0KquaWQ', client_secret='ALSLenkZwZ5WCZ-32MaziUw-O7tmeA',
                      user_agent='VanillaCast')
 
+red = redditCrawler()
+twit = twitterCrawler()
+
 def show_entry_fields(self):
+    redditCrawl(self)
+    twitterCrawl(self)
+
+def twitterCrawl(self):
     strVal = self.txtTwitter.get("1.0", 'end')
     if (strVal.strip()):
         self.txtTwitter.delete("1.0", 'end')
 
-    queryVal = self.txtSearch.get()  # "Query: %s" % (self.txtSearch.get())
-    self.txtTwitter.insert(tk.END, queryVal)
+    strInput = self.txtSearch.get()
+    twitResult = twit.search(strInput)
+    self.txtInterCount.insert(tk.END, "\nTwitter: ")
 
-    # query = e1.get() + " -filter:retweets" # The search term you want to find
-    # language = "en" #language
-    # results = api.search(q=query, lang=language, rpp=queryLimit) #initiate API call
+    for myTwitData in twitResult:
+        print(myTwitData.date)
+        print(myTwitData.commentCount)
+        # myData.addLikeCount(myData.interactionCount)
+        self.txtInterCount.insert(tk.END, myTwitData.interactionCount)
+        for tweet in myTwitData.getTopComments():
+            self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.text)
+            self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.url)
+            self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(myTwitData.date))
+            self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
 
-    # for tweet in results: # iterate through every tweets pulled
-    #    # printing the text stored inside the tweet object
-    #    e3.insert(tk.END, "\n\n")
-    #    e3.insert(tk.END, "User: " + tweet.user.screen_name)
-    #    e3.insert(tk.END, "\n")
-    #    e3.insert(tk.END, "Tweeted: \n")
-    #    e3.insert(tk.END, tweet.text)
-    #    e3.insert(tk.END, "\n------------------------------------------------")
-
-    redditCrawl(self)
-    saveQuery(self, queryVal)
-
+    saveQuery(self, strInput)
 
 def redditCrawl(self):
     str3Val = self.txtReddit.get("1.0", 'end')
     if (str3Val.strip()):
         self.txtReddit.delete("1.0", 'end')
 
-    ml_subreddit = reddit.subreddit(self.txtSearch.get())
+    strInput = self.txtSearch.get()
+    redResult = red.search(strInput)
+    self.txtInterCount.insert(tk.END, "\nReddit: ")
 
-    for post in ml_subreddit.hot(limit=queryLimit):
-        self.txtReddit.insert(tk.END, "\n\n")
-        self.txtReddit.insert(tk.END, "SubReddit: " + str(post.author))
-        self.txtReddit.insert(tk.END, "\n")
-        self.txtReddit.insert(tk.END, "Posted: \n")
-        self.txtReddit.insert(tk.END, post.title)
-        self.txtReddit.insert(tk.END, "\n")
-        self.txtReddit.insert(tk.END, "Description: \n")
-        self.txtReddit.insert(tk.END, post.selftext)
-        self.txtReddit.insert(tk.END, "\n------------------------------------------------")
+    for myRedData in redResult:
+        print(myRedData.date)
+        print(myRedData.source)
+        print(myRedData.commentCount)
+        self.txtInterCount.insert(tk.END, myRedData.interactionCount)
+        for post in myRedData.getTopComments():
+            if myRedData.source == "reddit":
+                self.txtReddit.insert(tk.END, "\nPost: \n" + post.text)
+                self.txtReddit.insert(tk.END, "\n\nRead More: " + post.url)
+                self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(myRedData.date))
+                self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
+
+    #ml_subreddit = reddit.subreddit(self.txtSearch.get())
+
+    # for post in ml_subreddit.hot(limit=queryLimit):
+    #     self.txtReddit.insert(tk.END, "\n\n")
+    #     self.txtReddit.insert(tk.END, "SubReddit: " + str(post.author))
+    #     self.txtReddit.insert(tk.END, "\n")
+    #     self.txtReddit.insert(tk.END, "Posted: \n")
+    #     self.txtReddit.insert(tk.END, post.title)
+    #     self.txtReddit.insert(tk.END, "\n")
+    #     self.txtReddit.insert(tk.END, "Description: \n")
+    #     self.txtReddit.insert(tk.END, post.selftext)
+    #     self.txtReddit.insert(tk.END, "\n------------------------------------------------")
 
 def showSearchHistory(self):
     field = self.txtSearchHistory
