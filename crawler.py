@@ -19,18 +19,16 @@ class crawler(ABC):
     def format(self):
         pass
 
-    
 class redditCrawler(crawler):
     reddit=''
     subRedditPost = []
 
     def __init__(self):
+        #setup reddit object
         self.reddit = praw.Reddit(
             client_id='zo7beVRdF2cE8w', 
             client_secret='NQtiZSmriDzkW6hY-HaACbG86Nytpw', 
-            user_agent='Java tests',
-            #password = "no",
-            #username="later"
+            user_agent='Java tests'
         )
 
     def search(self,input):
@@ -43,15 +41,16 @@ class redditCrawler(crawler):
         self.topic = input
         multiReddit = self.reddit.subreddits.search(self.topic,limit=5)
         for subr in multiReddit:        #get related subreddits
-            print("---------------------------------------------------------------------------------------------------------------")
+            print("----------------------------------------------------------------------------")
             print(subr.display_name)
             print(subr.subscribers)
             try:
-                if self.topic.lower() in str(subr.display_name).lower():                                        
-                    print('in if')              #if subreddit name contains topic
+                #removal of spaces and uppercase alpha as reddit does not allow those in subreddit name
+                if self.topic.lower().replace(" ","") in str(subr.display_name).lower():                                        
+                    #if subreddit name contains topic
                     self.subRedditPost.append(subr.top(time_filter='week',limit=100))
                 else:
-                    print('in else')            #if subreddit name does not contains topic
+                    #if subreddit name does not contains topic
                     self.subRedditPost.append(subr.search(self.topic,sort='top',time_filter='week',limit=100))  
             except: #supposed to throw specific error but either api or package updated and provided docs no longer correct
                 print("not allowed to view trafic")
@@ -59,7 +58,6 @@ class redditCrawler(crawler):
         self.format()
 
         return self.data
-        # c in this case is a subreddit obj
         
             # print("Title: ",submission.title)
             # print("Author: ",submission.author)
@@ -76,10 +74,10 @@ class redditCrawler(crawler):
         week, day1, day2, day3, day4, day5, day6, day7 = ([] for i in range(8))
         #sort into days of the week
         for postlist in self.subRedditPost:
-            print('mark')
             try:
                 for submission in postlist:
-                    created = submission.created_utc            #sort the crawled post by days in the past week
+                    #sort the crawled post by days in the past week
+                    created = submission.created_utc            
                     utcTime = datetime.timestamp(datetime.now())
                     if created < (utcTime-(6*86400)):
                         day1.append(submission)
@@ -115,30 +113,30 @@ class redditCrawler(crawler):
             day_summary = Mydata(self.topic, 'reddit', date)
             top3 = []
             low = 0
-            count =0
             for post in day:
                 if post.score == 0:
                     day_summary.addLikeCount(0)
                     #in this case we are unable to determine the about of people upvoting or downvoting posts
                 else:
-                    iCount = post.upvote_ratio  # get estimated interaction count
+                    # get estimated interaction count
+                    iCount = post.upvote_ratio  
                     iCount = iCount - (1-iCount)
                     iCount = post.score / (iCount*100)  # score if definitly true but the upvote ratio might not be due to reddit obsuring data
                     iCount *= 100
                     day_summary.addLikeCount(int(iCount))
-                if len(top3) < 3:
+                if (len(top3) < 3) and (not post.over_18):      #so that nsfw stuff does not appear in top posts
                     top3.append(post)
-                elif post.score>low:
+                elif (post.score>low) and (not post.over_18):
                     low, top3 = self.sortTop(post,top3)
-                count +=1
 
+            #additon of the top 3 post to the day summary
             for top in top3:
                 url = 'reddit.com'+top.permalink
                 day_summary.addPost(post.title,post.id,url,post.created_utc)
             self.data.append(day_summary)
-
         return None
 
+    #to sort out the top 3 posts of the day
     def sortTop(self,post,top3):
         low = 0
 
@@ -157,37 +155,13 @@ class redditCrawler(crawler):
 
     def getScore(self,n):
         return n.score
-    #notes and extra code
-
-    # for post in sreddit.top(time_filter='week',limit=100):
-    #     print(post.title)
-    #     self.data.addComment(post.title)
-    #     iCount = post.upvote_ratio
-    #     iCount = post.score/iCount #score if definitly true but the upvote ratio might not be
-    #     iCount *= 100
-    #     self.data.addLikeCount(int(iCount))
+    #notes
 
     # c in this case is a subreddit obj
     # cannot iterate here as the end of the list will be reached
     # for c in lst:
     #     print(c.display_name)
     #     print(c.subscribers)
-
-    # lst = self.reddit.subreddits.search(self.topic,limit=5)
-    #     # c in this case is a subreddit obj
-    #     for c in lst:
-    #         print(c.display_name)
-    #         print(c.subscribers)
-    #         try:   NEED TO BE A MOD OF THE SUBREDDIT FOR THIS TO WORK
-    #             var1=c.traffic() #var1 is a dict obj' IMPORTANT 
-    #             print(len(var1))
-    #             # varlst = var1["day"] 
-    #             # print(varlst[0])
-    #             # print(varlst[1])
-    #             # print(varlst[2])
-    #         except prawcore.NotFound:
-    #             print("not allowed to view trafic")
-    #     return lst
 
 class twitterCrawler(crawler):
 
