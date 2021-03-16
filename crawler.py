@@ -73,7 +73,7 @@ class redditCrawler(crawler):
     def format(self):
         # 1 week = 604800
         # 1 day = 86400
-        days, day1, day2, day3, day4, day5, day6, day7 = ([] for i in range(8))
+        week, day1, day2, day3, day4, day5, day6, day7 = ([] for i in range(8))
         #sort into days of the week
         for postlist in self.subRedditPost:
             print('mark')
@@ -97,38 +97,66 @@ class redditCrawler(crawler):
                         day7.append(submission)
             except:  # supposed to throw specific error but either api or package updated and docs no longer correct
                 print("not allowed to view trafic")
-        days.append(list(day1))  # oldest
-        days.append(list(day2))
-        days.append(list(day3))
-        days.append(list(day4))
-        days.append(list(day5))
-        days.append(list(day6))
-        days.append(list(day7))
+        week.append(list(day1))  # oldest
+        week.append(list(day2))
+        week.append(list(day3))
+        week.append(list(day4))
+        week.append(list(day5))
+        week.append(list(day6))
+        week.append(list(day7))
         n =0
-        for d in days:
+        for d in week:
             n = n+len(d)
         print(n," post crawled")
 
         #get data from the day's post
-        for day in days:
-            print(len(day))
-            n = 6
+        for day in week:
             date = datetime.now() - timedelta(days=n)
-            temp = Mydata(self.topic, 'reddit', date)
-            top3 = [0,0,0]
+            day_summary = Mydata(self.topic, 'reddit', date)
+            top3 = []
+            low = 0
+            count =0
             for post in day:
-                url = 'reddit.com'+post.permalink
-                temp.addPost(post.title,post.id,url,post.created_utc)
-                iCount = post.upvote_ratio  # get estimated interaction count
-                iCount = iCount - (1-iCount)
-                iCount = post.score / (iCount*100)  # score if definitly true but the upvote ratio might not be due to reddit obsuring data
-                iCount *= 100
-                temp.addLikeCount(int(iCount))
-            self.data.append(temp)
-            n -= 1
+                if post.score == 0:
+                    day_summary.addLikeCount(0)
+                    #in this case we are unable to determine the about of people upvoting or downvoting posts
+                else:
+                    iCount = post.upvote_ratio  # get estimated interaction count
+                    iCount = iCount - (1-iCount)
+                    iCount = post.score / (iCount*100)  # score if definitly true but the upvote ratio might not be due to reddit obsuring data
+                    iCount *= 100
+                    day_summary.addLikeCount(int(iCount))
+                if len(top3) < 3:
+                    top3.append(post)
+                elif post.score>low:
+                    low, top3 = self.sortTop(post,top3)
+                count +=1
 
+            for top in top3:
+                url = 'reddit.com'+top.permalink
+                day_summary.addPost(post.title,post.id,url,post.created_utc)
+            self.data.append(day_summary)
 
+        return None
 
+    def sortTop(self,post,top3):
+        low = 0
+
+        top3.append(post)
+        top3.sort(key=self.getScore)     
+        if len(top3) > 3:
+            top3.pop(0)
+        
+        low = top3[0].score
+        n = 1
+        for top in top3:
+            print(n,". ",top.title)
+            print("score: ", top.score)
+            n +=1
+        return low, top3
+
+    def getScore(self,n):
+        return n.score
     #notes and extra code
 
     # for post in sreddit.top(time_filter='week',limit=100):
