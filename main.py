@@ -243,7 +243,6 @@ def show_entry_fields(self):
     except Exception as e:
         print('Exception: ' + str(e))
     finally:
-        saveQuery(self, strInput)
         de.exportData(redResult)
         de.exportData(twitResult)
 
