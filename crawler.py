@@ -141,7 +141,7 @@ class redditCrawler(crawler):
 
             # additon of the top 3 post to the day summary
             for top in top3:
-                url = 'reddit.com' + top.permalink
+                url = f'https://reddit.com' + top.permalink
                 day_summary.addPost(post.title, post.id, url, post.created_utc)
             self.data.append(day_summary)
         return None

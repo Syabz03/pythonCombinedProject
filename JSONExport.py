@@ -11,14 +11,17 @@ class retrieval:
     def write_json(self, data, filename):
         pass
 
+    def getSearchHist(self):
+        pass
+
+    def addSearchHist(self, queryList):
+        pass
+
     def exportData(self, data):
         pass
     
-    def combinedData(self, data):
-        pass
-    
-    def searchHist(self, query):
-        pass
+    # def combinedData(self, data):
+    #     pass
 
 
 class dataExport(retrieval):
@@ -67,7 +70,7 @@ class dataExport(retrieval):
         self.write_json(hist_temp, self.searchHist_file) # Call write_json function to store items in hist_temp to specified file
 
     # Save data to file, according to source (Reddit or Twitter)
-    def exportData(self,data):
+    def exportData(self, data):
         data_temp = []
         posts_temp = []
         ids = []
@@ -75,10 +78,10 @@ class dataExport(retrieval):
         # Creating directory and file
         p = Path(self.path)
         p.mkdir(parents=True, exist_ok=True)
-
+        
         topic = str(data[0].topic) # get the topic the user searched for 
         source = str(data[0].source) # get the source (either reddit or twitter)
-        print(topic, source) # print for verification
+        # print(topic, source) # print for verification
         data_file = self.path + topic + "_" + source + "_data.json" 
         posts_file = self.path + topic + "_" + source + "_posts.json"
 

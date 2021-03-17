@@ -170,17 +170,28 @@ reddit = praw.Reddit(client_id='PESO3cS0KquaWQ', client_secret='ALSLenkZwZ5WCZ-3
 
 red = redditCrawler()
 twit = twitterCrawler()
+de = dataExport()
 
 def show_entry_fields(self):
-    redditCrawl(self)
-    twitterCrawl(self)
+    strInput = self.txtSearch.get()
+    redResult = ''
+    twitResult = ''
 
-def twitterCrawl(self):
+    try:
+        redResult = redditCrawl(self, strInput)
+        twitResult = twitterCrawl(self, strInput)
+    except Exception as e:
+        print('Exception: ' + str(e))
+    finally:
+        saveQuery(self, strInput)
+        de.exportData(redResult)
+        de.exportData(twitResult)
+
+def twitterCrawl(self, strInput):
     strVal = self.txtTwitter.get("1.0", 'end')
     if (strVal.strip()):
         self.txtTwitter.delete("1.0", 'end')
 
-    strInput = self.txtSearch.get()
     twitResult = twit.search(strInput)
     self.txtInterCount.insert(tk.END, "\nTwitter: ")
 
@@ -190,19 +201,19 @@ def twitterCrawl(self):
         # myData.addLikeCount(myData.interactionCount)
         self.txtInterCount.insert(tk.END, myTwitData.interactionCount)
         for tweet in myTwitData.getTopComments():
-            self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.text)
-            self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.url)
-            self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(myTwitData.date))
-            self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
+            if 'twitter' in tweet.url.lower():
+                self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.text)
+                self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.url)
+                self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(myTwitData.date))
+                self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
 
-    saveQuery(self, strInput)
+    return twitResult
 
-def redditCrawl(self):
+def redditCrawl(self, strInput):
     str3Val = self.txtReddit.get("1.0", 'end')
     if (str3Val.strip()):
         self.txtReddit.delete("1.0", 'end')
-
-    strInput = self.txtSearch.get()
+    
     redResult = red.search(strInput)
     self.txtInterCount.insert(tk.END, "\nReddit: ")
 
@@ -218,6 +229,7 @@ def redditCrawl(self):
                 self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(myRedData.date))
                 self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
 
+    return redResult
     #ml_subreddit = reddit.subreddit(self.txtSearch.get())
 
     # for post in ml_subreddit.hot(limit=queryLimit):
@@ -233,7 +245,6 @@ def redditCrawl(self):
 
 def showSearchHistory(self):
     field = self.txtSearchHistory
-    de = dataExport()
     hist = de.getSearchHist()
 
     strVal = field.get("1.0", 'end')
@@ -266,7 +277,6 @@ def saveQuery(self, query):
         if item: items_temp.append(item)
 
     # Store queries (past and current) to file
-    de = dataExport()
     de.addSearchHist(items_temp)
 
 if __name__ == '__main__':
