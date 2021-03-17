@@ -104,16 +104,22 @@ class dataExport(retrieval):
             to_dict = vars(submission)
             d_date = dp.parse(str(to_dict['date']))
             to_dict['date'] = str(d_date)
+            top_com = []
 
             tc = submission.getTopComments()
+            print("-- SUBMISSION -- " + source)
             for posts in tc:
                 posts_dict = vars(posts)
                 p_date = dp.parse(str(posts_dict['date']))
                 posts_dict['date'] = str(p_date)
 
                 if source.lower() in posts_dict['url'].lower() and posts_dict['id'] not in id:
-                    #print("found " + source)
                     posts_temp.append(posts_dict)
+
+                #if posts_dict['date'].split(' ')[0] == to_dict['date'].split(' ')[0]:
+                    top_com.append(posts_dict)
+
+            to_dict['topComments'] = top_com
 
             if source.lower() == to_dict['source'].lower():
                 data_temp.append(to_dict)

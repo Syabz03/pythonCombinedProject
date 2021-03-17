@@ -162,6 +162,7 @@ class Toplevel1:
         self.btnQuit.configure(command=root.quit)
 
         showSearchHistory(self)
+
 # END OF GUI
 
 # Reddit
@@ -178,12 +179,12 @@ def show_entry_fields(self):
     twitResult = ''
 
     try:
+        saveQuery(self, strInput)
         redResult = redditCrawl(self, strInput)
         twitResult = twitterCrawl(self, strInput)
     except Exception as e:
         print('Exception: ' + str(e))
     finally:
-        saveQuery(self, strInput)
         de.exportData(redResult)
         de.exportData(twitResult)
 

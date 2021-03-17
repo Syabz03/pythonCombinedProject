@@ -233,7 +233,10 @@ class twitterCrawler(crawler):
         # super().format(block)
 
         temp = Mydata(self.topic, 'Twitter', day)
-
+        
+        # if len(temp.getTopComments()) != 0:
+        #     temp.getTopComments().clear()
+        
         maxlike = [0, 0, 0]
 
         # Go through tweets and combine the interaction data into 1 number for 1 day
