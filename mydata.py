@@ -4,7 +4,7 @@ class Mydata:
     date=''
     interactionCount=''
     commentCount=''
-    topComments=[]
+    topComments=''
 
     def __init__(self,topic,platform,date):
         self.topic = topic
@@ -12,6 +12,7 @@ class Mydata:
         self.date = date
         self.interactionCount = 0
         self.commentCount =0
+        self.topComments=[]
     
     def addPost(self,text,id,url,date):
         self.topComments.append(Post(text,id,url,date))

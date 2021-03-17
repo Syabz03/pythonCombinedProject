@@ -86,14 +86,52 @@ class Toplevel1:
                               font="-family {Segoe UI Black} -size 10 -weight bold", foreground="#000000",
                               highlightbackground="#d9d9d9", highlightcolor="black", text='''Search History''')
 
-        self.txtInterCount = tk.Text(top)
-        self.txtInterCount.place(relx=0.219, rely=0.296, relheight=0.143, relwidth=0.357)
-        self.txtInterCount.configure(background="white", font="TkTextFont", foreground="black",
-                                     highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black",
-                                     wrap="word")
+        self.lblReddit = tk.Label(top)
+        self.lblReddit.place(relx=0.219, rely=0.222, height=27, width=284)
+        self.lblReddit.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
+                                 background="#ffa4a4",disabledforeground="#a3a3a3",
+                                 font="-family {Segoe UI Black} -size 10 -weight bold", foreground="#000000",
+                                 highlightbackground="#d9d9d9",highlightcolor="black")
+        self.lblReddit.configure(text='''Reddit''')
+
+        self.lblTwitter = tk.Label(top)
+        self.lblTwitter.place(relx=0.219, rely=0.352, height=27, width=283)
+        self.lblTwitter.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
+                                  background="#7ddeec",disabledforeground="#a3a3a3",
+                                  font="-family {Segoe UI Black} -size 10 -weight bold",
+                                  foreground="#000000",highlightbackground="#d9d9d9",
+                                  highlightcolor="black")
+        self.lblTwitter.configure(text='''Twitter''')
+
+        self.lblComments = tk.Label(top)
+        self.lblComments.place(relx=0.219, rely=0.259, height=21, width=284)
+        self.lblComments.configure(anchor='nw',background="#ffc4c4",disabledforeground="#a3a3a3",foreground="#000000")
+        self.lblComments.configure(text='''Comments: -''')
+
+        self.lblRetweets = tk.Label(top)
+        self.lblRetweets.place(relx=0.219, rely=0.389, height=21, width=283)
+        self.lblRetweets.configure(activebackground="#f9f9f9",activeforeground="black",anchor='nw',background="#b9edf4",
+                                   disabledforeground="#a3a3a3",foreground="#000000",
+                                   highlightbackground="#d9d9d9",highlightcolor="black")
+        self.lblRetweets.configure(text='''Retweets: -''')
+
+        self.lblUpvotes = tk.Label(top)
+        self.lblUpvotes.place(relx=0.219, rely=0.296, height=21, width=284)
+        self.lblUpvotes.configure(activebackground="#f9f9f9",activeforeground="black",anchor='nw',
+                                  background="#ffc4c4",disabledforeground="#a3a3a3",
+                                  font="-family {Segoe UI} -size 9",foreground="#000000",
+                                  highlightbackground="#d9d9d9",highlightcolor="black")
+        self.lblUpvotes.configure(text='''Upvotes: -''')
+
+        self.lblLikes = tk.Label(top)
+        self.lblLikes.place(relx=0.219, rely=0.426, height=21, width=283)
+        self.lblLikes.configure(activebackground="#f9f9f9",activeforeground="black",
+                                anchor='nw',background="#b9edf4",disabledforeground="#a3a3a3",
+                                foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black")
+        self.lblLikes.configure(text='''Likes: -''')
 
         self.Label2 = tk.Label(top)
-        self.Label2.place(relx=0.28, rely=0.241, height=25, width=197)
+        self.Label2.place(relx=0.28, rely=0.167, height=25, width=197)
         self.Label2.configure(activebackground="#f9f9f9", activeforeground="black", background="#f4efe3",
                               disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
@@ -106,7 +144,7 @@ class Toplevel1:
                                    selectbackground="blue", selectforeground="white")
 
         self.Label5 = tk.Label(top)
-        self.Label5.place(relx=0.341, rely=0.463, height=25, width=88)
+        self.Label5.place(relx=0.341, rely=0.478, height=25, width=88)
         self.Label5.configure(activebackground="#f9f9f9", activeforeground="black", background="#f4efe3",
                               disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
@@ -119,7 +157,7 @@ class Toplevel1:
                                  selectbackground="blue", selectforeground="white", wrap="word")
 
         self.Label3 = tk.Label(top)
-        self.Label3.place(relx=0.592, rely=0.044, height=25, width=327)
+        self.Label3.place(relx=0.597, rely=0.037, height=25, width=320)
         self.Label3.configure(activebackground="#f9f9f9", activeforeground="black", background="#ffa4a4",
                               disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
@@ -162,7 +200,22 @@ class Toplevel1:
         self.btnQuit.configure(command=root.quit)
 
         showSearchHistory(self)
-# END OF GUI
+
+        self.sysLabel = tk.Label(top)
+        self.sysLabel.place(relx=0.012, rely=0.111, height=21, width=334)
+        self.sysLabel.configure(activebackground="#f9f9f9", activeforeground="black",anchor='w',background="#f4efe3",
+                                disabledforeground="#a3a3a3",font="-family {Segoe UI} -size 9 -slant italic",
+                                foreground="#eb3034",highlightbackground="#d9d9d9",highlightcolor="black",justify='left')
+
+        self.cBoxGraph = ttk.Combobox(top, state='readonly', value=["1","2","30"]) #PLACEHOLDER
+        self.cBoxGraph.place(relx=0.219, rely=0.926, relheight=0.039, relwidth=0.074)
+        self.cBoxGraph.configure(takefocus="")
+
+        self.gphLabel = tk.Label(top)
+        self.gphLabel.place(relx=0.305, rely=0.926, height=21, width=353)
+        self.gphLabel.configure(anchor='w',background="#f4efe3",disabledforeground="#a3a3a3",foreground="#000000")
+        self.gphLabel.configure(text="Displaying posts from 21310230139") #PLACEHOLDER, WILL REMOVE
+
 
 # Reddit
 reddit = praw.Reddit(client_id='PESO3cS0KquaWQ', client_secret='ALSLenkZwZ5WCZ-32MaziUw-O7tmeA',
@@ -176,10 +229,17 @@ def show_entry_fields(self):
     strInput = self.txtSearch.get()
     redResult = ''
     twitResult = ''
-
     try:
-        redResult = redditCrawl(self, strInput)
-        twitResult = twitterCrawl(self, strInput)
+        if len(strInput) == 0:
+            self.sysLabel.configure(text='Field is empty! Please enter a search term.')
+        else:
+            self.sysLabel.configure(text='')
+            self.lblComments.configure(text='')
+            self.lblUpvotes.configure(text='')
+            self.lblRetweets.configure(text='')
+            self.lblLikes.configure(text='')
+            redResult = redditCrawl(self, strInput)
+            twitResult = twitterCrawl(self, strInput)
     except Exception as e:
         print('Exception: ' + str(e))
     finally:
@@ -192,56 +252,45 @@ def twitterCrawl(self, strInput):
     if (strVal.strip()):
         self.txtTwitter.delete("1.0", 'end')
 
+    strInput = self.txtSearch.get()
     twitResult = twit.search(strInput)
-    self.txtInterCount.insert(tk.END, "\nTwitter: ")
+    twitterCCount = 0
+    twitterICount = 0
 
     for myTwitData in twitResult:
-        print(myTwitData.date)
-        print(myTwitData.commentCount)
-        # myData.addLikeCount(myData.interactionCount)
-        self.txtInterCount.insert(tk.END, myTwitData.interactionCount)
+        twitterCCount += myTwitData.commentCount  # RETWEETS
+        twitterICount += myTwitData.interactionCount  # LIKES
         for tweet in myTwitData.getTopComments():
             if 'twitter' in tweet.url.lower():
                 self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.text)
                 self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.url)
                 self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(myTwitData.date))
                 self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
-
+    self.lblRetweets.configure(text="Retweets: " + str(twitterCCount))
+    self.lblLikes.configure(text="Likes: " + str(twitterICount))
     return twitResult
 
 def redditCrawl(self, strInput):
     str3Val = self.txtReddit.get("1.0", 'end')
     if (str3Val.strip()):
         self.txtReddit.delete("1.0", 'end')
-    
+
     redResult = red.search(strInput)
-    self.txtInterCount.insert(tk.END, "\nReddit: ")
+    redditCCount = 0
+    redditICount = 0
 
     for myRedData in redResult:
-        print(myRedData.date)
-        print(myRedData.source)
-        print(myRedData.commentCount)
-        self.txtInterCount.insert(tk.END, myRedData.interactionCount)
+        redditCCount += myRedData.commentCount  # COMMENTS
+        redditICount += myRedData.interactionCount  # UPVOTES
         for post in myRedData.getTopComments():
             if myRedData.source == "reddit":
                 self.txtReddit.insert(tk.END, "\nPost: \n" + post.text)
                 self.txtReddit.insert(tk.END, "\n\nRead More: " + post.url)
-                self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(myRedData.date))
+                self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(datetime.fromtimestamp(post.date)))
                 self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
-
+    self.lblComments.configure(text="Comments: " + str(redditCCount))
+    self.lblUpvotes.configure(text="Upvotes: " + str(redditICount))
     return redResult
-    #ml_subreddit = reddit.subreddit(self.txtSearch.get())
-
-    # for post in ml_subreddit.hot(limit=queryLimit):
-    #     self.txtReddit.insert(tk.END, "\n\n")
-    #     self.txtReddit.insert(tk.END, "SubReddit: " + str(post.author))
-    #     self.txtReddit.insert(tk.END, "\n")
-    #     self.txtReddit.insert(tk.END, "Posted: \n")
-    #     self.txtReddit.insert(tk.END, post.title)
-    #     self.txtReddit.insert(tk.END, "\n")
-    #     self.txtReddit.insert(tk.END, "Description: \n")
-    #     self.txtReddit.insert(tk.END, post.selftext)
-    #     self.txtReddit.insert(tk.END, "\n------------------------------------------------")
 
 def showSearchHistory(self):
     field = self.txtSearchHistory
@@ -254,6 +303,7 @@ def showSearchHistory(self):
         for items in hist:
             field.insert(tk.END, items + "\n")
     field.config(state='disabled')
+
 
 def saveQuery(self, query):
     items_temp = []
