@@ -57,7 +57,7 @@ class redditCrawler(crawler):
             except:  # supposed to throw specific error but either api or package updated and provided docs no longer correct
                 print("not allowed to view trafic")
 
-        self.format()
+        self._format()
 
         return self.data
 
@@ -70,7 +70,7 @@ class redditCrawler(crawler):
         # commentTree = submission.comments
         # print("comment 1",commentTree[0].body)
 
-    def format(self):
+    def _format(self):
         # 1 week = 604800
         # 1 day = 86400
         week, day1, day2, day3, day4, day5, day6, day7 = ([] for i in range(8))
@@ -142,26 +142,28 @@ class redditCrawler(crawler):
             # additon of the top 3 post to the day summary
             for top in top3:
                 url = 'reddit.com' + top.permalink
-                day_summary.addPost(post.title, post.id, url, post.created_utc)
+                day_summary.addPost(top.title, top.id, url, top.created_utc)
             self.data.append(day_summary)
         return None
 
     # to sort out the top 3 posts of the day
     def sortTop(self, post, top3):
-        low = 0
+        low = 0         
 
-        top3.append(post)
+        #add the new post to the list and sort with lowest at the front
+        top3.append(post) 
         top3.sort(key=self.getScore)
         if len(top3) > 3:
             top3.pop(0)
 
+        #set the lowest score of top 3
         low = top3[0].score
         n = 1
         for top in top3:
             print(n, ". ", top.title)
             print("score: ", top.score)
             n += 1
-        return low, top3
+        return low, top3 # return the lowest score and the list of top3 posts
 
     def getScore(self, n):
         return n.score
