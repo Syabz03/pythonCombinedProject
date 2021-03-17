@@ -1,5 +1,5 @@
 import unittest
-from crawler import *
+from crawler import redditCrawler,twitterCrawler
 
 class Testcrawler(unittest.TestCase):
     pass
@@ -15,6 +15,11 @@ class TestredditCrawler(unittest.TestCase):
             count += day.interactionCount
 
         self.assertGreater(count,0)
+
+    #unable to test format due to how it links to search
+
+    def test_sortTop(self):
+        pass
         #self.fail() #use when case fails
 
 # class TesttwitterCrawler(unittest.TestCase):
