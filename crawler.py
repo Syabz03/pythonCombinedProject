@@ -117,6 +117,7 @@ class redditCrawler(crawler):
         if len(temp.getTopComments()) != 0:
             temp.getTopComments().clear()
 
+        n = 6
         for day in week:
             date = datetime.now() - timedelta(days=n)
             day_summary = Mydata(self.topic, 'reddit', date)
@@ -144,6 +145,7 @@ class redditCrawler(crawler):
                 url = 'reddit.com' + top.permalink
                 day_summary.addPost(top.title, top.id, url, top.created_utc)
             self.data.append(day_summary)
+            n -= 1
         return None
 
     # to sort out the top 3 posts of the day
