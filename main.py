@@ -246,14 +246,18 @@ def show_entry_fields(self):
         self.lblUpvotes.configure(text='')
         self.lblRetweets.configure(text='')
         self.lblLikes.configure(text='')
+        
+        err = ''
         try: 
             redResult = redditCrawl(self, strInput)
             twitResult = twitterCrawl(self, strInput)
+            saveQuery(self, strInput)
         except Exception as e:
+            err = e
             print('Exception at show_entry_fields: ' + str(e))
-        finally:
-            try :
-                saveQuery(self, strInput)
+        
+        if (err == ''):
+            try:
                 de.exportData(redResult, strInput)
                 de.exportData(twitResult, strInput)
             except Exception as e:
