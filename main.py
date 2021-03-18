@@ -357,6 +357,16 @@ def redditCrawl(self, strInput):
 
     return redResult
 
+"""A function to display previous user searches to UI 
+
+Attributes:
+    field : Tkinter's Text()
+        obtains the text in the field on the UI that contains all previous searches
+    hist : list
+        contains user's previous searches 
+    
+"""
+
 def showSearchHistory(self):
     field = self.txtSearchHistory
     hist = de.getSearchHist()
@@ -369,6 +379,21 @@ def showSearchHistory(self):
             field.insert(tk.END, items + "\n")
     field.config(state='disabled')
 
+"""A function to add new user's search to file
+
+Args:
+    query : str
+        the topic or input searched by the user.
+
+Attributes:
+    items_temp : arr
+        temp array to store all previous and current searches before writing to file 
+    field : txtBox
+        obtain the field on the UI that contains all previous searches
+    index : int
+        to keep count of current for loop's iteration count 
+    
+"""
 
 def saveQuery(self, query):
     items_temp = []
