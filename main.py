@@ -13,6 +13,7 @@ from matplotlib.backends.backend_tkagg import (
 # Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
+from datetime import datetime, timedelta
 
 queryLimit = 5
 
@@ -206,7 +207,6 @@ class Toplevel1:
         self.cBoxGraph = ttk.Combobox(top, state='readonly') #PLACEHOLDER
         self.cBoxGraph.place(relx=0.219, rely=0.926, relheight=0.039, relwidth=0.074)
         self.cBoxGraph.configure(takefocus="")
-        self.cBoxGraph.bind("<<ComboboxSelected>>", lambda _: displayDay(self))
 
         self.gphLabel = tk.Label(top)
         self.gphLabel.place(relx=0.305, rely=0.926, height=21, width=353)
@@ -224,20 +224,20 @@ de = dataExport()
 dayArray, commentArray, upvotesArray, retweetsArray, likesArray = [], [], [], [], []
 
 def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesArray):
-
     self.canvas.get_tk_widget().place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
 
+    # Clears graph before plotting to prevent appending two graphs at once
     self.figure.clear()
     # self.figure.
     plt = self.figure.add_subplot(1, 1, 1)
     x = dayArray
-
     # now there's 3 sets of points
     yCO = commentsArray
     yUV = upvotesArray
     yRT = retweetsArray
     yLK = likesArray
 
+    plt.set(yscale="log")
     plt.plot(x, yCO, label='Comments', marker='o', color='red')
     plt.plot(x, yUV, label='Upvotes', marker='o', color='#fa93b0')
     plt.plot(x, yRT, label='Retweets', marker='o', color='#2374f7')
@@ -246,21 +246,53 @@ def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesA
     plt.legend()
     self.figure.canvas.draw()
 
-def displayDay(self):
+def displayDay(self, redResult, twitResult):
     date = self.cBoxGraph.get()
-    self.gphLabel.configure(text="Displaying posts from " + str(date))
+    date_obj = datetime.strptime(date, '%d-%m-%Y')
+    date_obj = date_obj.strftime("%Y-%m-%d")
+    date = str(date_obj)
+
+    self.txtReddit.configure(state='normal')
+    self.txtTwitter.configure(state='normal')
+
     if(self.cBoxGraph.get()!=''):
-        print("Selected the right date!")
+        self.txtReddit.delete("1.0", 'end')
+        self.txtTwitter.delete("1.0", 'end')
         #Display the day's posts and tweets
+        for myRedData in redResult:
+            for post in myRedData.getTopComments():
+                if date in str(post['date']):
+                    print(post['text'])
+                    self.txtReddit.insert(tk.END, "\nPost: \n" + post['text'])
+                    self.txtReddit.insert(tk.END, "\n\nRead More: " + post['url'])
+                    self.txtReddit.insert(tk.END, "\n\nPosted On: " + str((post['date'])))
+                    self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
+        for myTwit in twitResult:
+            for tweet in myTwit.getTopComments():
+                if date in str(tweet['date']):
+                    print(tweet['text'])
+                    self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet['text'])
+                    self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet['url'])
+                    self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str((tweet['date'])))
+                    self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
+
+        if self.txtTwitter.compare("end-1c", "==", "1.0"):
+            self.txtTwitter.insert(tk.END, "No tweets found on this day!")
+        if self.txtReddit.compare("end-1c", "==", "1.0"):
+            self.txtReddit.insert(tk.END, "No posts found on this day!")
+
+    self.gphLabel.configure(text="Displaying results from " + str(date))
+    self.txtReddit.configure(state='disabled')
+    self.txtTwitter.configure(state='disabled')
 
 def show_entry_fields(self):
     strInput = self.txtSearch.get()
     redResult = ''
     twitResult = ''
 
-    if len(dayArray)!=0 or len(commentArray)!=0 \
-            or len(upvotesArray)!=0 or len(retweetsArray)!=0 \
-            or len(likesArray)!=0:
+    self.cBoxGraph.bind("<<ComboboxSelected>>", lambda _: displayDay(self, redResult, twitResult))
+
+    if len(dayArray)!=0 or len(commentArray)!=0 or len(upvotesArray)!=0 or len(retweetsArray)!=0 or len(likesArray)!=0:
         dayArray.clear()
         commentArray.clear()
         upvotesArray.clear()
@@ -275,13 +307,14 @@ def show_entry_fields(self):
         self.lblUpvotes.configure(text='')
         self.lblRetweets.configure(text='')
         self.lblLikes.configure(text='')
-
         err = ''
         try:
             self.txtReddit.configure(state='normal')
             self.txtTwitter.configure(state='normal')
             redResult = redditCrawl(self, strInput)
+            displayRedditPosts(self, redResult)
             twitResult = twitterCrawl(self, strInput)
+            displayTwitterTweets(self, twitResult)
             plotGraph(self, dayArray, commentArray, upvotesArray, retweetsArray, likesArray)
             self.txtReddit.configure(state='disabled')
             self.txtTwitter.configure(state='disabled')
@@ -301,9 +334,13 @@ def twitterCrawl(self, strInput):
     strVal = self.txtTwitter.get("1.0", 'end')
     if (strVal.strip()):
         self.txtTwitter.delete("1.0", 'end')
-
-    strInput = self.txtSearch.get()
     twitResult = twit.search(strInput)
+    return twitResult
+
+def displayTwitterTweets(self, twitResult):
+    strVal = self.txtTwitter.get("1.0", 'end')
+    if (strVal.strip()):
+        self.txtTwitter.delete("1.0", 'end')
     twitterCCount = 0
     twitterICount = 0
 
@@ -321,19 +358,21 @@ def twitterCrawl(self, strInput):
                 self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
     self.lblRetweets.configure(text="Retweets: " + str(twitterCCount))
     self.lblLikes.configure(text="Likes: " + str(twitterICount))
-    print(retweetsArray)
-    print(likesArray)
-    return twitResult
 
 def redditCrawl(self, strInput):
     str3Val = self.txtReddit.get("1.0", 'end')
     if (str3Val.strip()):
         self.txtReddit.delete("1.0", 'end')
     redResult = red.search(strInput)
+    return redResult
+
+def displayRedditPosts(self, redResult):
+    str3Val = self.txtReddit.get("1.0", 'end')
+    if (str3Val.strip()):
+        self.txtReddit.delete("1.0", 'end')
     redditCCount = 0
     redditICount = 0
 
-    minDate = ''
     for myRedData in redResult:
         commentArray.append(myRedData.commentCount)
         upvotesArray.append(myRedData.interactionCount)
@@ -349,10 +388,9 @@ def redditCrawl(self, strInput):
                 self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
     self.lblComments.configure(text="Comments: " + str(redditCCount))
     self.lblUpvotes.configure(text="Upvotes: " + str(redditICount))
+
+    #Populate combobox with values consisting of dates from the posts.
     self.cBoxGraph.config(values=dayArray)
-    print(commentArray)
-    print(upvotesArray)
-    print(dayArray)
     self.gphLabel.configure(text="Displaying posts from " + str(min(dayArray)) + " to " + str(max(dayArray)))
 
     return redResult
