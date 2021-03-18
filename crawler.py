@@ -58,6 +58,8 @@ class redditCrawler(crawler):
 
     def search(self, input):
         """ Searches using the reddit API for the past week for the related topic
+        by attempting to find a related subreddits to the topic then searching within 
+        the related subreddits
         Args:
             input (str): Topic that will be searched for
 
@@ -65,12 +67,14 @@ class redditCrawler(crawler):
             list: a list 7 mydata Objects representing the past week of data on the topic on reddit
         
         Notes:
+            in the case of a very small or no results
             we are relying on reddit sorting system therefore unrelated posts might come up
             i.e. "GPU" might come up in a escape from tarkov post cause of an in game item
+            i.e. no posts found, reddit returns random results
         """
         super().search(input)
         self.data=[]
-        multiReddit = self.reddit.subreddits.search(self.topic, limit=5)
+        multiReddit = self.reddit.subreddits.search(self.topic, limit=10)
         for subr in multiReddit:  # get related subreddits
             print("----------------------------------------------------------------------------")
             print(subr.display_name)
@@ -99,7 +103,21 @@ class redditCrawler(crawler):
         # commentTree = submission.comments
         # print("comment 1",commentTree[0].body)
 
-    def generalSearch(self):
+    def generalSearch(self,input):
+        """ Searches using the reddit API for the past week for the related topic in all of reddit
+
+        Args:
+            input (str): Topic that will be searched for
+
+        Returns:
+            list: a list 7 mydata Objects representing the past week of data on the topic on reddit
+        
+        Notes:
+            in the case of a very small or no results
+            we are relying on reddit sorting system therefore unrelated posts might come up
+            i.e. "GPU" might come up in a escape from tarkov post cause of an in game item
+            i.e. no posts found, reddit returns random results
+        """
         try:
             self.subRedditPost = []
 
@@ -107,7 +125,7 @@ class redditCrawler(crawler):
         except :
             print("not allowed to view trafic")
         self._format()
-        return None
+        return self.data
 
     def _format(self):
         # 1 week = 604800
@@ -148,7 +166,7 @@ class redditCrawler(crawler):
             n = n + len(d)
         print(n, " post crawled")
         if n == 0:
-            self.generalSearch()
+            self.generalSearch(self.topic)
             pass
 
         

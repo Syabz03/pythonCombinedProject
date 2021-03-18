@@ -17,10 +17,7 @@ class TestredditCrawler(unittest.TestCase):
         self.assertGreater(count,0)
 
     #unable to test format due to how it links to search
-
-    def test_sortTop(self):
-        pass
-        #self.fail() #use when case fails
+    #self.fail() #use when case fails
 
 # class TesttwitterCrawler(unittest.TestCase):
 #     def test_search(self):
