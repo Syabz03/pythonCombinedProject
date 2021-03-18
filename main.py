@@ -7,6 +7,12 @@ from crawler import *
 from JSONExport import *
 import sys
 import myPage_support
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg, NavigationToolbar2Tk)
+# Implement the default Matplotlib key bindings.
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
 
 queryLimit = 5
 
@@ -137,11 +143,16 @@ class Toplevel1:
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Interaction Count''')
 
-        self.graphCanvas = tk.Canvas(top)
-        self.graphCanvas.place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
-        self.graphCanvas.configure(background="#ffffff", borderwidth="2", highlightbackground="#f2f0ce",
-                                   highlightcolor="black", insertbackground="black", relief="ridge",
-                                   selectbackground="blue", selectforeground="white")
+        #self.graphCanvas = FigureCanvasTkAgg(fig, top)
+        #self.graphCanvas.place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
+        # self.graphCanvas.configure(background="#ffffff", borderwidth="2", highlightbackground="#f2f0ce",
+        #                            highlightcolor="black", insertbackground="black", relief="ridge",
+        #                            selectbackground="blue", selectforeground="white")
+        self.figure = Figure(figsize=(5, 4), dpi=100)
+
+        self.canvas = FigureCanvasTkAgg(self.figure, master=top)
+        self.canvas.get_tk_widget().place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
+
 
         self.Label5 = tk.Label(top)
         self.Label5.place(relx=0.341, rely=0.478, height=25, width=88)
@@ -150,7 +161,7 @@ class Toplevel1:
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Graph''')
 
-        self.txtReddit = tk.Text(top)
+        self.txtReddit = tk.Text(top, state='disabled')
         self.txtReddit.place(relx=0.597, rely=0.093, relheight=0.35, relwidth=0.39)
         self.txtReddit.configure(background="white", font="TkTextFont", foreground="black",
                                  highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black",
@@ -163,7 +174,7 @@ class Toplevel1:
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Reddit''')
 
-        self.txtTwitter = tk.Text(top)
+        self.txtTwitter = tk.Text(top, state='disabled')
         self.txtTwitter.place(relx=0.597, rely=0.519, relheight=0.389, relwidth=0.39)
         self.txtTwitter.configure(background="white", font="TkTextFont", foreground="black",
                                   highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black",
@@ -207,7 +218,7 @@ class Toplevel1:
                                 disabledforeground="#a3a3a3",font="-family {Segoe UI} -size 9 -slant italic",
                                 foreground="#eb3034",highlightbackground="#d9d9d9",highlightcolor="black",justify='left')
 
-        self.cBoxGraph = ttk.Combobox(top, state='readonly', value=["1","2","30"]) #PLACEHOLDER
+        self.cBoxGraph = ttk.Combobox(top, state='readonly') #PLACEHOLDER
         self.cBoxGraph.place(relx=0.219, rely=0.926, relheight=0.039, relwidth=0.074)
         self.cBoxGraph.configure(takefocus="")
         self.cBoxGraph.bind("<<ComboboxSelected>>", lambda _: displayDay(self))
@@ -225,19 +236,46 @@ red = redditCrawler()
 twit = twitterCrawler()
 de = dataExport()
 
+dayArray, commentArray, upvotesArray, retweetsArray, likesArray = [], [], [], [], []
+# upvotesArray = []
+# dayArray = []
+# retweetsArray = []
+# likesArray = []
+
+# self.graphCanvas
+#Initialise plots
+#fig, ax = plt.subplots()
+#dayArray, commentsArray, upvotesArray, retweetsArray, likesArray
+def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesArray):
+
+    plt = self.figure.add_subplot(1, 1, 1)
+    x = dayArray
+
+    # now there's 3 sets of points
+    yCO = commentsArray
+    yUV = upvotesArray
+    yRT = retweetsArray
+    yLK = likesArray
+
+    plt.plot(x, yCO, label='Comments', marker='o', color='red')
+    plt.plot(x, yUV, label='Upvotes', marker='o', color='#fa93b0')
+    plt.plot(x, yRT, label='Retweets', marker='o', color='#2374f7')
+    plt.plot(x, yLK, label='Likes', marker='o', color='#accafa')
+
+    self.figure.canvas.draw()
+
 def displayDay(self):
     date = self.cBoxGraph.get()
     self.gphLabel.configure(text="Displaying posts from " + str(date))
-    if(self.cBoxGraph.get()=='16-03-2021'):
+    if(self.cBoxGraph.get()!=''):
         print("Selected the right date!")
         #Display the day's posts and tweets
-
 
 def show_entry_fields(self):
     strInput = self.txtSearch.get()
     redResult = ''
     twitResult = ''
-    
+
     if len(strInput) == 0:
         self.sysLabel.configure(text='Field is empty! Please enter a search term.')
     else:
@@ -246,16 +284,20 @@ def show_entry_fields(self):
         self.lblUpvotes.configure(text='')
         self.lblRetweets.configure(text='')
         self.lblLikes.configure(text='')
-        
         err = ''
-        try: 
+        try:
+            self.txtReddit.configure(state='normal')
+            self.txtTwitter.configure(state='normal')
             redResult = redditCrawl(self, strInput)
             twitResult = twitterCrawl(self, strInput)
+            plotGraph(self, dayArray, commentArray, upvotesArray, retweetsArray, likesArray)
+            self.txtReddit.configure(state='disabled')
+            self.txtTwitter.configure(state='disabled')
             saveQuery(self, strInput)
         except Exception as e:
             err = e
             print('Exception at show_entry_fields: ' + str(e))
-        
+
         if (err == ''):
             try:
                 de.exportData(redResult, strInput)
@@ -272,8 +314,7 @@ def twitterCrawl(self, strInput):
     twitResult = twit.search(strInput)
     twitterCCount = 0
     twitterICount = 0
-    retweetsArray = []
-    likesArray = []
+
 
     for myTwitData in twitResult:
         retweetsArray.append(myTwitData.commentCount)
@@ -284,7 +325,7 @@ def twitterCrawl(self, strInput):
             if 'twitter' in tweet.url.lower():
                 self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.text)
                 self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.url)
-                self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(myTwitData.date))
+                self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(tweet.date))
                 self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
     self.lblRetweets.configure(text="Retweets: " + str(twitterCCount))
     self.lblLikes.configure(text="Likes: " + str(twitterICount))
@@ -296,13 +337,9 @@ def redditCrawl(self, strInput):
     str3Val = self.txtReddit.get("1.0", 'end')
     if (str3Val.strip()):
         self.txtReddit.delete("1.0", 'end')
-
     redResult = red.search(strInput)
     redditCCount = 0
     redditICount = 0
-    commentArray = []
-    upvotesArray = []
-    dayArray = []
 
 
     minDate = ''
@@ -311,7 +348,7 @@ def redditCrawl(self, strInput):
         upvotesArray.append(myRedData.interactionCount)
         redditCCount += myRedData.commentCount  # COMMENTS
         redditICount += myRedData.interactionCount  # UPVOTES
-        dayArray.append(myRedData.date.strftime("%d-%m-%Y"))
+        dayArray.append(myRedData.date)
         for post in myRedData.getTopComments():
             if myRedData.source == "reddit":
                 self.txtReddit.insert(tk.END, "\nPost: \n" + post.text)
