@@ -69,6 +69,7 @@ class redditCrawler(crawler):
             i.e. "GPU" might come up in a escape from tarkov post cause of an in game item
         """
         super().search(input)
+        self.data=[]
         multiReddit = self.reddit.subreddits.search(self.topic, limit=5)
         for subr in multiReddit:  # get related subreddits
             print("----------------------------------------------------------------------------")
@@ -82,9 +83,8 @@ class redditCrawler(crawler):
                 else:
                     # if subreddit name does not contains topic
                     self.subRedditPost.append(subr.search(self.topic, sort='top', time_filter='week', limit=100))
-            except error.HTTPError as e:
-                if e.code == 403:
-                    print("not allowed to view trafic")
+            except:
+                print("not allowed to view trafic")
 
         self._format()
 
@@ -98,6 +98,17 @@ class redditCrawler(crawler):
         # print("comment count:",submission.num_comments)
         # commentTree = submission.comments
         # print("comment 1",commentTree[0].body)
+
+    def generalSearch(self):
+        try:
+            self.subRedditPost = []
+
+            self.subRedditPost.append(self.reddit.subreddit("all").search(input,'hot',limit=100))
+        except :
+            print("not allowed to view trafic")
+        self._format()
+
+        return self.data
 
     def _format(self):
         # 1 week = 604800
@@ -124,9 +135,8 @@ class redditCrawler(crawler):
                         day6.append(submission)
                     else:
                         day7.append(submission)
-            except error.HTTPError as e:
-                if e.code == 403:
-                    print("not allowed to view trafic")
+            except:
+                print("not allowed to view trafic")
         week.append(list(day1))  # oldest
         week.append(list(day2))
         week.append(list(day3))
@@ -138,12 +148,16 @@ class redditCrawler(crawler):
         for d in week:
             n = n + len(d)
         print(n, " post crawled")
+        if n == 0:
+            self.generalSearch()
+            pass
 
         
         n = 6
         # get data from the day's post
         for day in week:
             date = datetime.now() - timedelta(days=n)
+            date = date.strftime("%d-%m-%Y")
             day_summary = Mydata(self.topic, 'reddit', date)
             top3 = []
             low = 0
