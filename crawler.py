@@ -103,7 +103,7 @@ class redditCrawler(crawler):
         try:
             self.subRedditPost = []
 
-            self.subRedditPost.append(self.reddit.subreddit("all").search(input,'hot',limit=100))
+            self.subRedditPost.append(self.reddit.subreddit("all").search(input,'top',limit=100))
         except :
             print("not allowed to view trafic")
         self._format()
