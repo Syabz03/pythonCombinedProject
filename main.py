@@ -284,6 +284,7 @@ def show_entry_fields(self):
         self.lblUpvotes.configure(text='')
         self.lblRetweets.configure(text='')
         self.lblLikes.configure(text='')
+
         err = ''
         try:
             self.txtReddit.configure(state='normal')
