@@ -14,6 +14,17 @@ class dataExport():
             file name to be created/searched for storing Reddit & Twitter data
         check_hist_file : str
             use function Path() for the program to find the path 'path'
+    
+    Methods:
+        write_json(data, filename) :
+            write values in 'data' to a file with value of 'filename'
+        getSearchHist :
+            returns user's search history to be displayed on UI 
+        addSearchHist(queryList) : 
+            receive values in 'queryList' to a dict before writing to a JSON file with 'write_json' method
+        exportData(data, topic) :
+            function to read values in 'data' and prepare for export to JSON file with 'write_json' method
+
     """
 
     # Creating directory 'data' for saving JSON files
@@ -32,7 +43,9 @@ class dataExport():
             contains the crawled data
         filename: str
             name for the file to be saved as by the program
+    
     """
+
     def write_json(self, data, filename): # Function to add to JSON
         with open(filename, 'w') as f:
             json.dump(data, f)
@@ -42,13 +55,15 @@ class dataExport():
     Attributes:
         hist_temp : dict
             contains the crawled data
-        hist_arr : arr
+        hist_arr : list
             name for the file to be saved as by the program
 
     Returns:
         hist_arr : list
             list of past user searches
+    
     """
+
     def getSearchHist(self): # Function to get user's search history from file to show on UI
         hist_temp = {}
         hist_arr = []
@@ -78,7 +93,9 @@ class dataExport():
     Attributes:
         hist_temp : dict
             to store data in queryList as value to a dict key 'search'
+    
     """
+
     def addSearchHist(self, queryList): # Function to save user's search query to JSON file # Add current search query to data file for future reference
         hist_temp = {}
         hist_temp['search'] = queryList # Insert list of query from Search History text box to hist_temp dictionary
@@ -93,11 +110,11 @@ class dataExport():
             user's current search query
 
     Attributes:
-        data_temp : arr
+        data_temp : list
             to store 'Mydata' object's items
-        posts_temp : arr
+        posts_temp : list
             to store all posts that was crawled
-        ids : arr
+        ids : list
             to store all ids of posts in the current '_post.json' file (if available)
         source : str
             get the source of the data (either Reddit or Twitter)
@@ -111,6 +128,7 @@ class dataExport():
             use function Path() for the program to find the path 'posts_file' and return to the variable 'check_p_file'
     
     """
+
     def exportData(self, data, topic): # Save data to file, according to source (Reddit or Twitter)
         data_temp = []
         posts_temp = []

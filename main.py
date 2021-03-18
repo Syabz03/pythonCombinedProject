@@ -25,16 +25,6 @@ queryLimit = 5
 # auth = tweepy.OAuthHandler(consumer_key, consumer_secret) #Creating the authentication object
 # auth.set_access_token(access_token, access_token_secret) # Setting your access token and secret
 # api = tweepy.API(auth,wait_on_rate_limit=True) # Creating the API object while passing in auth information
-
-# c = redditCrawler()
-# rdata = c.search("HoLoLiVe")
-# de = dataExport()
-# de.exportData(rdata)
-#
-# t = twitterCrawler()
-# tdata = t.search("hololive")
-# de.exportData(tdata)
-
 # START OF GUI
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -143,15 +133,10 @@ class Toplevel1:
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Interaction Count''')
 
-        #self.graphCanvas = FigureCanvasTkAgg(fig, top)
-        #self.graphCanvas.place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
-        # self.graphCanvas.configure(background="#ffffff", borderwidth="2", highlightbackground="#f2f0ce",
-        #                            highlightcolor="black", insertbackground="black", relief="ridge",
-        #                            selectbackground="blue", selectforeground="white")
-        self.figure = Figure(figsize=(5, 4), dpi=100)
 
+        self.figure = Figure(figsize=(5, 4), dpi=100)
         self.canvas = FigureCanvasTkAgg(self.figure, master=top)
-        self.canvas.get_tk_widget().place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
+
 
 
         self.Label5 = tk.Label(top)
@@ -237,17 +222,13 @@ twit = twitterCrawler()
 de = dataExport()
 
 dayArray, commentArray, upvotesArray, retweetsArray, likesArray = [], [], [], [], []
-# upvotesArray = []
-# dayArray = []
-# retweetsArray = []
-# likesArray = []
 
-# self.graphCanvas
-#Initialise plots
-#fig, ax = plt.subplots()
-#dayArray, commentsArray, upvotesArray, retweetsArray, likesArray
 def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesArray):
 
+    self.canvas.get_tk_widget().place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
+
+    self.figure.clear()
+    # self.figure.
     plt = self.figure.add_subplot(1, 1, 1)
     x = dayArray
 
@@ -262,6 +243,7 @@ def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesA
     plt.plot(x, yRT, label='Retweets', marker='o', color='#2374f7')
     plt.plot(x, yLK, label='Likes', marker='o', color='#accafa')
 
+    plt.legend()
     self.figure.canvas.draw()
 
 def displayDay(self):
@@ -275,6 +257,15 @@ def show_entry_fields(self):
     strInput = self.txtSearch.get()
     redResult = ''
     twitResult = ''
+
+    if len(dayArray)!=0 or len(commentArray)!=0 \
+            or len(upvotesArray)!=0 or len(retweetsArray)!=0 \
+            or len(likesArray)!=0:
+        dayArray.clear()
+        commentArray.clear()
+        upvotesArray.clear()
+        retweetsArray.clear()
+        likesArray.clear()
 
     if len(strInput) == 0:
         self.sysLabel.configure(text='Field is empty! Please enter a search term.')
@@ -316,12 +307,12 @@ def twitterCrawl(self, strInput):
     twitterCCount = 0
     twitterICount = 0
 
-
     for myTwitData in twitResult:
         retweetsArray.append(myTwitData.commentCount)
         likesArray.append(myTwitData.interactionCount)
         twitterCCount += myTwitData.commentCount  # RETWEETS
         twitterICount += myTwitData.interactionCount  # LIKES
+        self.txtTwitter.insert(tk.END, "\n===============================================")
         for tweet in myTwitData.getTopComments():
             if 'twitter' in tweet.url.lower():
                 self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.text)
@@ -342,7 +333,6 @@ def redditCrawl(self, strInput):
     redditCCount = 0
     redditICount = 0
 
-
     minDate = ''
     for myRedData in redResult:
         commentArray.append(myRedData.commentCount)
@@ -350,6 +340,7 @@ def redditCrawl(self, strInput):
         redditCCount += myRedData.commentCount  # COMMENTS
         redditICount += myRedData.interactionCount  # UPVOTES
         dayArray.append(myRedData.date)
+        self.txtReddit.insert(tk.END, "\n===============================================")
         for post in myRedData.getTopComments():
             if myRedData.source == "reddit":
                 self.txtReddit.insert(tk.END, "\nPost: \n" + post.text)
@@ -366,6 +357,16 @@ def redditCrawl(self, strInput):
 
     return redResult
 
+"""A function to display previous user searches to UI 
+
+Attributes:
+    field : Tkinter's Text()
+        obtains the text in the field on the UI that contains all previous searches
+    hist : list
+        contains user's previous searches 
+    
+"""
+
 def showSearchHistory(self):
     field = self.txtSearchHistory
     hist = de.getSearchHist()
@@ -378,6 +379,21 @@ def showSearchHistory(self):
             field.insert(tk.END, items + "\n")
     field.config(state='disabled')
 
+"""A function to add new user's search to file
+
+Args:
+    query : str
+        the topic or input searched by the user.
+
+Attributes:
+    items_temp : arr
+        temp array to store all previous and current searches before writing to file 
+    field : txtBox
+        obtain the field on the UI that contains all previous searches
+    index : int
+        to keep count of current for loop's iteration count 
+    
+"""
 
 def saveQuery(self, query):
     items_temp = []
