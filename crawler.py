@@ -103,12 +103,11 @@ class redditCrawler(crawler):
         try:
             self.subRedditPost = []
 
-            self.subRedditPost.append(self.reddit.subreddit("all").search(input,'top',limit=100))
+            self.subRedditPost.append(self.reddit.subreddit("all").search(input,'top',limit=100,time_filter='week'))
         except :
             print("not allowed to view trafic")
         self._format()
-
-        return self.data
+        return None
 
     def _format(self):
         # 1 week = 604800
