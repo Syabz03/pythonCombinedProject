@@ -210,11 +210,11 @@ class Toplevel1:
         self.cBoxGraph = ttk.Combobox(top, state='readonly', value=["1","2","30"]) #PLACEHOLDER
         self.cBoxGraph.place(relx=0.219, rely=0.926, relheight=0.039, relwidth=0.074)
         self.cBoxGraph.configure(takefocus="")
+        self.cBoxGraph.bind("<<ComboboxSelected>>", lambda _: displayDay(self))
 
         self.gphLabel = tk.Label(top)
         self.gphLabel.place(relx=0.305, rely=0.926, height=21, width=353)
         self.gphLabel.configure(anchor='w',background="#f4efe3",disabledforeground="#a3a3a3",foreground="#000000")
-        self.gphLabel.configure(text="Displaying posts from 21310230139") #PLACEHOLDER, WILL REMOVE
 
 
 # Reddit
@@ -224,6 +224,14 @@ reddit = praw.Reddit(client_id='PESO3cS0KquaWQ', client_secret='ALSLenkZwZ5WCZ-3
 red = redditCrawler()
 twit = twitterCrawler()
 de = dataExport()
+
+def displayDay(self):
+    date = self.cBoxGraph.get()
+    self.gphLabel.configure(text="Displaying posts from " + str(date))
+    if(self.cBoxGraph.get()=='16-03-2021'):
+        print("Selected the right date!")
+        #Display the day's posts and tweets
+
 
 def show_entry_fields(self):
     strInput = self.txtSearch.get()
@@ -260,8 +268,12 @@ def twitterCrawl(self, strInput):
     twitResult = twit.search(strInput)
     twitterCCount = 0
     twitterICount = 0
+    retweetsArray = []
+    likesArray = []
 
     for myTwitData in twitResult:
+        retweetsArray.append(myTwitData.commentCount)
+        likesArray.append(myTwitData.interactionCount)
         twitterCCount += myTwitData.commentCount  # RETWEETS
         twitterICount += myTwitData.interactionCount  # LIKES
         for tweet in myTwitData.getTopComments():
@@ -272,6 +284,8 @@ def twitterCrawl(self, strInput):
                 self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
     self.lblRetweets.configure(text="Retweets: " + str(twitterCCount))
     self.lblLikes.configure(text="Likes: " + str(twitterICount))
+    print(retweetsArray)
+    print(likesArray)
     return twitResult
 
 def redditCrawl(self, strInput):
@@ -282,10 +296,18 @@ def redditCrawl(self, strInput):
     redResult = red.search(strInput)
     redditCCount = 0
     redditICount = 0
+    commentArray = []
+    upvotesArray = []
+    dayArray = []
 
+
+    minDate = ''
     for myRedData in redResult:
+        commentArray.append(myRedData.commentCount)
+        upvotesArray.append(myRedData.interactionCount)
         redditCCount += myRedData.commentCount  # COMMENTS
         redditICount += myRedData.interactionCount  # UPVOTES
+        dayArray.append(myRedData.date.strftime("%d-%m-%Y"))
         for post in myRedData.getTopComments():
             if myRedData.source == "reddit":
                 self.txtReddit.insert(tk.END, "\nPost: \n" + post.text)
@@ -294,6 +316,12 @@ def redditCrawl(self, strInput):
                 self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
     self.lblComments.configure(text="Comments: " + str(redditCCount))
     self.lblUpvotes.configure(text="Upvotes: " + str(redditICount))
+    self.cBoxGraph.config(values=dayArray)
+    print(commentArray)
+    print(upvotesArray)
+    print(dayArray)
+    self.gphLabel.configure(text="Displaying posts from " + str(min(dayArray)) + " to " + str(max(dayArray)))
+
     return redResult
 
 def showSearchHistory(self):
