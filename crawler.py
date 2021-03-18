@@ -370,6 +370,7 @@ class twitterCrawler(crawler):
 
             # Check if the post's like count is higher than the current top three 
             for i in range(len(maxlike)):
+
                 if maxlike[i] < tweet.favorite_count:
                     
                     # After replacing immediately break out, so it does not fill the same value into every element of the array
