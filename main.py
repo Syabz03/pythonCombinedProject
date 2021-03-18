@@ -181,7 +181,7 @@ class Toplevel1:
 
         self.btnSearch = tk.Button(top)
         self.btnSearch.place(relx=0.426, rely=0.019, height=44, width=87)
-        self.btnSearch.configure(activebackground="#fafeda", activeforeground="#000000", background="#f4ecbd",
+        self.btnSearch.configure(activebackground="#fafeda", activeforeground="#000000", background="#00BFA5",
                                  disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
                                  foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0",
                                  text='''Search''')
