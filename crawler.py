@@ -251,8 +251,6 @@ class twitterCrawler(crawler):
         searches 50 tweets per day from the past week using the API for the topic given
     """
 
-    topthree = []
-
     def __init__(self):
         """
         Parameters
@@ -288,6 +286,7 @@ class twitterCrawler(crawler):
 
         self.api = tweepy.API(self.auth,
                               wait_on_rate_limit=True)  # Creating the API object while passing in auth information
+        
 
     def search(self,input):
         """
@@ -311,6 +310,7 @@ class twitterCrawler(crawler):
         """
         self.data = []
         self.topic = input
+        self.topids = [] # Store every id of top tweets
 
         tweet_limit = 50 #Controls the number of tweets to search for a day
 
@@ -325,8 +325,8 @@ class twitterCrawler(crawler):
             self.format(results, day)
 
         # Print section for checking
-        print("\n========================================Twitter Result===========================================\n")
-        
+        #print("\n========================================Twitter Result===========================================\n")
+        #
         #for n in range(0, 7):
         #
         #    print(f"Day {n+1})\n")
@@ -336,11 +336,6 @@ class twitterCrawler(crawler):
         #       print(self.data[n].topComments[i].text)
         #       print(self.data[n].topComments[i].url)
         #       print()
-        #
-        #    #for j in range(3):
-        #    #
-        #    #    print("Top tweet: " + str(self.topthree[n].topComments[j].text))
-        #
         #
         #    print("Total retweets: " + str(self.data[n].commentCount))
         #    print("Total likes: " + str(self.data[n].interactionCount))
@@ -368,9 +363,17 @@ class twitterCrawler(crawler):
         """
         # super().format(block)
 
+        # The day limit for search results
+        # -8 hours to align with UTC timezone that twitter tweets use
+        # Any tweets before this day should not be considered
+        # Basically narrowing the tweet results to be within 24 hours of the day used to search
+        beforelimit = (day - timedelta(days=2, hours=8)).replace(microsecond=0)
+        afterlimit = (day - timedelta(days=1, hours=8)).replace(microsecond=0)
+
         temp = Mydata(self.topic, 'Twitter', day)
-        
-        maxlike = [0, 0, 0] # For keeping track of the top three like counts of a day
+        #temppost = Mydata(self.topic, 'Twitter', day)
+        lowest = 0
+        toptweets = []
 
         #
         #   GENERAL SECTION
@@ -382,53 +385,51 @@ class twitterCrawler(crawler):
             #url = f"https://twitter.com/i/web/status/{tweet.id}"
             #temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
 
+            if tweet is None:
+                return
+
             temp.addLikeCount(tweet.favorite_count)
             temp.addCommentCount(tweet.retweet_count)
 
-            # Check if the post's like count is higher than the current top three 
-            for i in range(len(maxlike)):
-                if maxlike[i] < tweet.favorite_count:
-                    
-                    # After replacing immediately break out, so it does not fill the same value into every element of the array
-                    maxlike[i] = tweet.favorite_count
-                    break
+            # Deny tweets that are not within the same day from entering top tweets
+            #if tweet.created_at > afterlimit or tweet.created_at < beforelimit:
+            #    continue
 
-        #print("MAX LIKE: ")
-        #print(maxlike)
+            if len(toptweets) < 3 and tweet.id not in self.topids:
+                toptweets.append(tweet)
+                self.topids.append(tweet.id)
+            elif tweet.favorite_count > lowest and tweet.id not in self.topids:
+                lowest, toptweets = self.sortTop(tweet, toptweets)
 
-        #
-        #   SECTION TO FILTER OUT TOP THREE POSTS
-        #   Find the top three posts and append to a separate list
-        #
+        for tweet in toptweets:
 
-        print("\n=====================================================\n")
+            #print(tweet.created_at)
 
-        #temptop = Mydata(self.topic, 'Twitter', day)
-        
-        count = 0
+            url = f"https://twitter.com/i/web/status/{tweet.id}"
+            temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
 
-        #Only store three tweets
-        while count < 3:
-
-            # Go through tweets again to find top three tweets
-            for i in maxlike:
-
-                for tweet in block:
-                
-                    if tweet.favorite_count == i:
-
-                        #print(tweet.text)
-                        print(tweet.created_at)
-
-                        url = f"https://twitter.com/i/web/status/{tweet.id}"
-                        temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
-
-                        count += 1
-
-                        print("Count:", count)
-                    
-                    
+        #self.toptweets.append(temppost)
 
         self.data.append(temp)
-        #self.topthree.append(temptop)
+
+    def sortTop(self, tweet, toptweets):
+        """
+        sorts the top three tweets and removes the tweet with the lowest like count 
+        """
+
+        toptweets.append(tweet) # Append the tweet into list of top 3 tweets
+        self.topids.append(tweet.id) # Remember every id of any added tweet
+        
+        toptweets.sort(key=lambda x: x.favorite_count) # Sort by like count
+
+        # Since this method is called when the list is equal or greater than 3, the least popular tweet has to be removed
+        removetweet = toptweets.pop(0)
+
+        # Remove the id of the tweet being removed from the top three
+        if removetweet.id in self.topids:
+            self.topids.remove(removetweet.id)
+
+        lowest = toptweets[0].favorite_count
+
+        return lowest, toptweets
     
