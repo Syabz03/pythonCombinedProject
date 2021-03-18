@@ -50,6 +50,23 @@ class dataExport():
         with open(filename, 'w') as f:
             json.dump(data, f)
     
+    """A function to read data from a file that has the given filename
+
+    Args:
+        filename : str
+            name of file to be read by the program and store the values to variable 'cur_data'
+    
+    Return:
+        cur_data : list
+            list of all data in the file
+    
+    """
+
+    def read_json(self, filename):
+        with open(filename, 'r') as json_file:
+            cur_data = json.load(json_file)
+            return cur_data  
+
     """A function to get user's previous searches and return it to the caller
 
     Attributes:
@@ -69,14 +86,12 @@ class dataExport():
         hist_arr = []
         
         if self.check_hist_file.is_file():
-            with open(self.check_hist_file, 'r') as json_file:
-                try:
-                    cur_data = json.load(json_file)
-                    hist_temp = cur_data
-                    if hist_temp: hist_arr = hist_temp['search']
+            try:
+                hist_temp = self.read_json(self.check_hist_file)
+                if hist_temp: hist_arr = hist_temp['search']
 
-                except Exception as e:
-                    print('Get Search History - Exception: ' + str(e))
+            except Exception as e:
+                print('Get Search History - Exception: ' + str(e))
             
         elif not self.check_hist_file.is_file(): 
             print("No Search History ")
@@ -145,22 +160,20 @@ class dataExport():
         if not check_d_file.is_file(): self.write_json(data_temp, data_file)
         if not check_p_file.is_file(): self.write_json(data_temp, posts_file)
 
-        with open(posts_file, 'r') as json_file:
-            try:
-                cur_data = json.load(json_file)
-                posts_temp = cur_data
-                for id in posts_temp: ids.append(id['id'])
-            except Exception as e:
-                print('Exception: ' + str(e))
+        try:
+            cur_data = self.read_json(posts_file)
+            posts_temp = cur_data
+            for id in posts_temp: ids.append(id['id'])
+        except Exception as e:
+            print('Exception: ' + str(e))
 
         id = set(ids)
         for submission in data:
             to_dict = vars(submission)
-            to_dict['date'] = str(dp.parse(str(to_dict['date'])))
+            to_dict['date'] = str(dp.parse(str(to_dict['date']))).split()[0]
             top_com = []
 
             tc = submission.getTopComments()
-            #print("-- SUBMISSION -- " + source)
             for posts in tc:
                 posts_dict = vars(posts)
                 posts_dict['date'] = str(dp.parse(str(posts_dict['date'])))
