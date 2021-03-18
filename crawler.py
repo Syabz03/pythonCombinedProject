@@ -204,8 +204,48 @@ class redditCrawler(crawler):
 
 
 class twitterCrawler(crawler):
+    """
+    A class that inherits from the crawler class for crawling Twitter
+
+    Attributes
+    ----------
+    topthree : object list
+        
+        stores the top three tweets of a day. One element in the list represents a day
+
+    Methods
+    -------
+    search(input)
+        
+        searches 50 tweets per day from the past week using the API for the topic given
+    """
+
+    topthree = []
 
     def __init__(self):
+        """
+        Parameters
+        ----------
+        consumer_key : str
+            
+            twitter account key for creating OAuth1a authentication with Twitter
+        
+        consumer_secret : str
+            
+            twitter account secret key for creating OAuth1a authentication with Twitter
+        
+        access_token : str
+            
+            twitter account access token for generating access token from Twitter
+        
+        access_token_secret : str
+            
+            twitter account secret token for generating access token from Twitter
+        
+        api : API object
+            
+            stores API object for API methods
+        """
         consumer_key = "VpNVndPOykZXjQgfTg2RD21xz"
         consumer_secret = "1LyM7m5lTmNWwzUUSJF2kN04B5bZvRStY663PjNEnQRCS6b2QW"
         access_token = "1358367734417903620-liyj12fLuUrQGM09nsqiVqiAsFKuRc"
@@ -219,80 +259,145 @@ class twitterCrawler(crawler):
                               wait_on_rate_limit=True)  # Creating the API object while passing in auth information
 
     def search(self,input):
+        """
+        searches 50 tweets per day from the past week using the API for the topic given
+        
+        Parameters
+        ----------
+        input : str
+            
+            the topic to be searched
+
+        Returns
+        -------
+        list
+            
+            a list of size 7 mydata objects containing a list of posts, a total retweet count and a total like count
+
+        Notes
+        -----
+        the method works by searching a number of tweets of a certain day, however since the API cannot exactly search for a single day, it would add tweets of days up to a week before the specified day if it cannot find enough tweets, hence very popular tweets might come up multiple times
+        """
         self.data = []
-        self.topthree = []
         self.topic = input
 
-        tweet_limit = 50
+        tweet_limit = 50 #Controls the number of tweets to search for a day
 
-        # For loop to change target day, api searches for tweets of the day before
+        # For loop to change target day, api searches for tweets
         # The until tag returns tweets created before the given date. I.e. -1 for today, 6 for 6 days before (Total 7 days)
+        # Twitter API does not have the ability to search for tweets of a single day, so this method is used to give the closest representation
         for n in range(-1, 6):
             day = datetime.now() - timedelta(days=n)
             results = self.api.search(q=f"{input} -filter:replies -filter:retweets", result_type="mixed", count=tweet_limit, until=day.strftime("%Y-%m-%d")) # Find tweets for that day
             
-            #self.top(results)
-
+            # Format the search result block of that day
             self.format(results, day)
 
-        # Temp tweet print function
+        # Print section for checking
         print("\n========================================Twitter Result===========================================\n")
-    
-        for n in range(0, 7):
-    
-           print(f"Day {n+1})\n")
-    
-           #for i in range(tweet_limit):
-           #
-           #    print(self.data[n].topComments[i].text)
-           #    print(self.data[n].topComments[i].url)
-           #    print()
-    
-           print("Total retweets: " + str(self.data[n].commentCount))
-           print("Total likes: " + str(self.data[n].interactionCount))
-           print()
+        
+        #for n in range(0, 7):
+        #
+        #    print(f"Day {n+1})\n")
+        #
+        #    for i in range(len(self.data[n].topComments)):
+        #    
+        #       print(self.data[n].topComments[i].text)
+        #       print(self.data[n].topComments[i].url)
+        #       print()
+        #
+        #    #for j in range(3):
+        #    #
+        #    #    print("Top tweet: " + str(self.topthree[n].topComments[j].text))
+        #
+        #
+        #    print("Total retweets: " + str(self.data[n].commentCount))
+        #    print("Total likes: " + str(self.data[n].interactionCount))
+        #    print()
            
         return self.data
 
     def format(self, block, day):
+        """
+        takes the results of a particular day and totals the like/retweet counts for that day, while also storing the tweets
+        
+        Parameters
+        ----------
+        block : SearchResults object
+            
+            the block of tweets returned by twitter's API to be looked through
+
+        day : datetime.date
+
+            the date used to search
+
+        Notes
+        -----
+        the important parameters are added into the data list, while the topthree list is for storing the top three tweets of the particular day
+        """
         # super().format(block)
 
         temp = Mydata(self.topic, 'Twitter', day)
         
-        # if len(temp.getTopComments()) != 0:
-        #     temp.getTopComments().clear()
-        
-        maxlike = [0, 0, 0]
+        maxlike = [0, 0, 0] # For keeping track of the top three like counts of a day
+
+        #
+        #   GENERAL SECTION
+        #   For totalling like and comment count
+        #
 
         # Go through tweets and combine the interaction data into 1 number for 1 day
         for tweet in block:
-            url = f"https://twitter.com/i/web/status/{tweet.id}"
-            temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
-
+            #url = f"https://twitter.com/i/web/status/{tweet.id}"
+            #temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
 
             temp.addLikeCount(tweet.favorite_count)
             temp.addCommentCount(tweet.retweet_count)
 
             # Check if the post's like count is higher than the current top three 
-            for i in maxlike:
-                if i < tweet.favorite_count:
+            for i in range(len(maxlike)):
+                if maxlike[i] < tweet.favorite_count:
+                    
                     # After replacing immediately break out, so it does not fill the same value into every element of the array
-                    i = tweet.favorite_count
+                    maxlike[i] = tweet.favorite_count
                     break
 
-        self.data.append(temp)
+        #print("MAX LIKE: ")
+        #print(maxlike)
+
+        #
+        #   SECTION TO FILTER OUT TOP THREE POSTS
+        #   Find the top three posts and append to a separate list
+        #
+
+        print("\n=====================================================\n")
 
         #temptop = Mydata(self.topic, 'Twitter', day)
-        # Go through tweets again to find top three tweets
-        for i in maxlike:
-            for tweet in block:
-            
-                if tweet.favorite_count is i:
-                    
-                    url = f"https://twitter.com/i/web/status/{tweet.id}"
-                    #temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
-                    
-                    self.topthree.append(Post(tweet.text, tweet.id, url, day))
+        
+        count = 0
 
-    #Get top 3 post for day
-    #def top(self, block):
+        #Only store three tweets
+        while count < 3:
+
+            # Go through tweets again to find top three tweets
+            for i in maxlike:
+
+                for tweet in block:
+                
+                    if tweet.favorite_count == i:
+
+                        #print(tweet.text)
+                        print(tweet.created_at)
+
+                        url = f"https://twitter.com/i/web/status/{tweet.id}"
+                        temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
+
+                        count += 1
+
+                        print("Count:", count)
+                    
+                    
+
+        self.data.append(temp)
+        #self.topthree.append(temptop)
+    
