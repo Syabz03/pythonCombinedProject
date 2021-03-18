@@ -20,8 +20,6 @@ class retrieval:
     def exportData(self, data):
         pass
     
-    # def combinedData(self, data):
-    #     pass
 
 
 class dataExport(retrieval):
@@ -70,7 +68,7 @@ class dataExport(retrieval):
         self.write_json(hist_temp, self.searchHist_file) # Call write_json function to store items in hist_temp to specified file
 
     # Save data to file, according to source (Reddit or Twitter)
-    def exportData(self, data):
+    def exportData(self, data, topic):
         data_temp = []
         posts_temp = []
         ids = []
@@ -79,9 +77,8 @@ class dataExport(retrieval):
         p = Path(self.path)
         p.mkdir(parents=True, exist_ok=True)
         
-        topic = str(data[0].topic) # get the topic the user searched for 
         source = str(data[0].source) # get the source (either reddit or twitter)
-        # print(topic, source) # print for verification
+        print(topic, source) # print for verification
         data_file = self.path + topic + "_" + source + "_data.json" 
         posts_file = self.path + topic + "_" + source + "_posts.json"
 
@@ -107,7 +104,7 @@ class dataExport(retrieval):
             top_com = []
 
             tc = submission.getTopComments()
-            print("-- SUBMISSION -- " + source)
+            #print("-- SUBMISSION -- " + source)
             for posts in tc:
                 posts_dict = vars(posts)
                 p_date = dp.parse(str(posts_dict['date']))

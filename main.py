@@ -229,22 +229,27 @@ def show_entry_fields(self):
     strInput = self.txtSearch.get()
     redResult = ''
     twitResult = ''
-    try:
-        if len(strInput) == 0:
-            self.sysLabel.configure(text='Field is empty! Please enter a search term.')
-        else:
-            self.sysLabel.configure(text='')
-            self.lblComments.configure(text='')
-            self.lblUpvotes.configure(text='')
-            self.lblRetweets.configure(text='')
-            self.lblLikes.configure(text='')
+    
+    if len(strInput) == 0:
+        self.sysLabel.configure(text='Field is empty! Please enter a search term.')
+    else:
+        self.sysLabel.configure(text='')
+        self.lblComments.configure(text='')
+        self.lblUpvotes.configure(text='')
+        self.lblRetweets.configure(text='')
+        self.lblLikes.configure(text='')
+        try: 
             redResult = redditCrawl(self, strInput)
             twitResult = twitterCrawl(self, strInput)
-    except Exception as e:
-        print('Exception: ' + str(e))
-    finally:
-        de.exportData(redResult)
-        de.exportData(twitResult)
+        except Exception as e:
+            print('Exception at show_entry_fields: ' + str(e))
+        finally:
+            try :
+                saveQuery(self, strInput)
+                de.exportData(redResult, strInput)
+                de.exportData(twitResult, strInput)
+            except Exception as e:
+                print('Exception at exporting data: ' + str(e))
 
 def twitterCrawl(self, strInput):
     strVal = self.txtTwitter.get("1.0", 'end')
