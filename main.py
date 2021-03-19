@@ -26,6 +26,7 @@ queryLimit = 5
 # auth = tweepy.OAuthHandler(consumer_key, consumer_secret) #Creating the authentication object
 # auth.set_access_token(access_token, access_token_secret) # Setting your access token and secret
 # api = tweepy.API(auth,wait_on_rate_limit=True) # Creating the API object while passing in auth information
+
 # START OF GUI
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -342,7 +343,7 @@ def show_entry_fields(self):
         retweetsArray.clear()
         likesArray.clear()
 
-    if len(strInput) == 0:
+    if len(strInput) == 0 or len(strInput.strip()) == 0:
         self.sysLabel.configure(text='Field is empty! Please enter a search term.')
     else:
         self.sysLabel.configure(text='')
@@ -444,9 +445,6 @@ def redditCrawl(self, strInput):
     redResult = red.search(strInput)
     return redResult
 
-
-
-
 def displayRedditPosts(self, redResult):
     """A function to display Reddit posts and interaction counts on the TKinter elements
 
@@ -488,8 +486,6 @@ def displayRedditPosts(self, redResult):
     #Populate combobox with values consisting of dates from the posts.
     self.cBoxGraph.config(values=dayArray)
     self.gphLabel.configure(text="Displaying posts from " + str(min(dayArray)) + " to " + str(max(dayArray)))
-
-
 
 def showSearchHistory(self):
     """A function to display previous user searches to UI

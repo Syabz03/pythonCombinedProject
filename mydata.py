@@ -89,7 +89,7 @@ class Mydata:
         return self.topComments
 
 class Post:
-    """Represents 1 day of data from Reddit or Twitter 
+    """Represents 1 post/tweet
     Attributes:
         text(str): tweet/post content
         id(str): platform identifier for the post
