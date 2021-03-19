@@ -252,29 +252,6 @@ class twitterCrawler(crawler):
     """
 
     def __init__(self):
-        """
-        Parameters
-        ----------
-        consumer_key : str
-            
-        twitter account key for creating OAuth1a authentication with Twitter
-        
-        consumer_secret : str
-            
-        twitter account secret key for creating OAuth1a authentication with Twitter
-        
-        access_token : str
-            
-        twitter account access token for generating access token from Twitter
-        
-        access_token_secret : str
-            
-        twitter account secret token for generating access token from Twitter
-        
-        api : API object
-            
-        stores API object for API methods
-        """
         consumer_key = "VpNVndPOykZXjQgfTg2RD21xz"
         consumer_secret = "1LyM7m5lTmNWwzUUSJF2kN04B5bZvRStY663PjNEnQRCS6b2QW"
         access_token = "1358367734417903620-liyj12fLuUrQGM09nsqiVqiAsFKuRc"
@@ -341,16 +318,6 @@ class twitterCrawler(crawler):
     def _format(self, block, day):
         """
         takes the results of a particular day and totals the like/retweet counts for that day, while also storing the top tweets
-        
-        Parameters
-        ----------
-        block : SearchResults object
-            
-        the block of tweets returned by twitter's API to be looked through
-
-        day : datetime.date
-
-        the date used to search the API
         """
 
         daywidth = 2 # Width of days accepted into top tweets list
@@ -401,16 +368,6 @@ class twitterCrawler(crawler):
     def _sortTop(self, tweet, toptweets):
         """
         sorts the top tweets and removes the tweet with the lowest like count
-
-        Parameters
-        ----------
-        tweet : tweet object
-            
-        a single tweet from API search
-
-        toptweets : list
-
-        list of top tweets
         """
 
         toptweets.append(tweet) # Append the tweet into list of top 3 tweets
