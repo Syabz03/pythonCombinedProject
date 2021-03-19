@@ -7,6 +7,13 @@ from crawler import *
 from JSONExport import *
 import sys
 import myPage_support
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg, NavigationToolbar2Tk)
+# Implement the default Matplotlib key bindings.
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
+from datetime import datetime, timedelta
 
 queryLimit = 5
 
@@ -19,16 +26,6 @@ queryLimit = 5
 # auth = tweepy.OAuthHandler(consumer_key, consumer_secret) #Creating the authentication object
 # auth.set_access_token(access_token, access_token_secret) # Setting your access token and secret
 # api = tweepy.API(auth,wait_on_rate_limit=True) # Creating the API object while passing in auth information
-
-# c = redditCrawler()
-# rdata = c.search("HoLoLiVe")
-# de = dataExport()
-# de.exportData(rdata)
-#
-# t = twitterCrawler()
-# tdata = t.search("hololive")
-# de.exportData(tdata)
-
 # START OF GUI
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
@@ -68,7 +65,7 @@ class Toplevel1:
         _ana1color = '#d9d9d9'  # X11 color: 'gray85'
         _ana2color = '#ececec'  # Closest X11 color: 'gray92'
 
-        top.geometry("821x540+695+284")
+        top.geometry("1920x1017")
         top.minsize(120, 1)
         top.maxsize(1924, 1061)
         top.resizable(1, 1)
@@ -77,119 +74,119 @@ class Toplevel1:
 
         self.txtSearchHistory = tk.Text(top)
         self.txtSearchHistory.place(relx=0.012, rely=0.278, relheight=0.631, relwidth=0.185)
-        self.txtSearchHistory.configure(background="white", font="TkTextFont", foreground="black",
+        self.txtSearchHistory.configure(background="white", foreground="black", font="-family {Segoe UI} -size 15",
                                         highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black",
                                         selectbackground="blue", selectforeground="white", wrap="word")
+
         self.Label1 = tk.Label(top)
-        self.Label1.place(relx=0.012, rely=0.222, height=25, width=142)
+        self.Label1.place(relx=0.012, rely=0.222, height=47, width=332)
         self.Label1.configure(activebackground="#f9f9f9", activeforeground="black", background="#f4efe3",
-                              font="-family {Segoe UI Black} -size 10 -weight bold", foreground="#000000",
+                              font="-family {Segoe UI Black} -size 15 -weight bold", foreground="#000000",
                               highlightbackground="#d9d9d9", highlightcolor="black", text='''Search History''')
 
         self.lblReddit = tk.Label(top)
-        self.lblReddit.place(relx=0.219, rely=0.222, height=27, width=284)
+        self.lblReddit.place(relx=0.219, rely=0.222, height=51, width=665)
         self.lblReddit.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
                                  background="#ffa4a4",disabledforeground="#a3a3a3",
-                                 font="-family {Segoe UI Black} -size 10 -weight bold", foreground="#000000",
+                                 font="-family {Segoe UI Black} -size 15 -weight bold", foreground="#000000",
                                  highlightbackground="#d9d9d9",highlightcolor="black")
         self.lblReddit.configure(text='''Reddit''')
 
         self.lblTwitter = tk.Label(top)
-        self.lblTwitter.place(relx=0.219, rely=0.352, height=27, width=283)
+        self.lblTwitter.place(relx=0.219, rely=0.352, height=51, width=663)
         self.lblTwitter.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
                                   background="#7ddeec",disabledforeground="#a3a3a3",
-                                  font="-family {Segoe UI Black} -size 10 -weight bold",
+                                  font="-family {Segoe UI Black} -size 15 -weight bold",
                                   foreground="#000000",highlightbackground="#d9d9d9",
                                   highlightcolor="black")
         self.lblTwitter.configure(text='''Twitter''')
 
         self.lblComments = tk.Label(top)
-        self.lblComments.place(relx=0.219, rely=0.259, height=21, width=284)
-        self.lblComments.configure(anchor='nw',background="#ffc4c4",disabledforeground="#a3a3a3",foreground="#000000")
+        self.lblComments.place(relx=0.219, rely=0.259, height=40, width=665)
+        self.lblComments.configure(anchor='nw',background="#ffc4c4",disabledforeground="#a3a3a3",foreground="#000000",font="-family {Segoe UI} -size 15")
         self.lblComments.configure(text='''Comments: -''')
 
         self.lblRetweets = tk.Label(top)
-        self.lblRetweets.place(relx=0.219, rely=0.389, height=21, width=283)
+        self.lblRetweets.place(relx=0.219, rely=0.389, height=39, width=663)
         self.lblRetweets.configure(activebackground="#f9f9f9",activeforeground="black",anchor='nw',background="#b9edf4",
-                                   disabledforeground="#a3a3a3",foreground="#000000",
+                                   disabledforeground="#a3a3a3",foreground="#000000",font="-family {Segoe UI} -size 15",
                                    highlightbackground="#d9d9d9",highlightcolor="black")
         self.lblRetweets.configure(text='''Retweets: -''')
 
         self.lblUpvotes = tk.Label(top)
-        self.lblUpvotes.place(relx=0.219, rely=0.296, height=21, width=284)
+        self.lblUpvotes.place(relx=0.219, rely=0.296, height=40, width=665)
         self.lblUpvotes.configure(activebackground="#f9f9f9",activeforeground="black",anchor='nw',
                                   background="#ffc4c4",disabledforeground="#a3a3a3",
-                                  font="-family {Segoe UI} -size 9",foreground="#000000",
+                                  font="-family {Segoe UI} -size 15",foreground="#000000",
                                   highlightbackground="#d9d9d9",highlightcolor="black")
         self.lblUpvotes.configure(text='''Upvotes: -''')
 
         self.lblLikes = tk.Label(top)
-        self.lblLikes.place(relx=0.219, rely=0.426, height=21, width=283)
+        self.lblLikes.place(relx=0.219, rely=0.426, height=40, width=663)
         self.lblLikes.configure(activebackground="#f9f9f9",activeforeground="black",
-                                anchor='nw',background="#b9edf4",disabledforeground="#a3a3a3",
+                                anchor='nw',background="#b9edf4",disabledforeground="#a3a3a3",font="-family {Segoe UI} -size 15",
                                 foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black")
         self.lblLikes.configure(text='''Likes: -''')
 
         self.Label2 = tk.Label(top)
-        self.Label2.place(relx=0.28, rely=0.167, height=25, width=197)
+        self.Label2.place(relx=0.28, rely=0.167, height=47, width=460)
         self.Label2.configure(activebackground="#f9f9f9", activeforeground="black", background="#f4efe3",
-                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
+                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
-                              text='''Interaction Count''')
+                              text='''Interaction Count for the week''')
 
-        self.graphCanvas = tk.Canvas(top)
-        self.graphCanvas.place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
-        self.graphCanvas.configure(background="#ffffff", borderwidth="2", highlightbackground="#f2f0ce",
-                                   highlightcolor="black", insertbackground="black", relief="ridge",
-                                   selectbackground="blue", selectforeground="white")
+        self.figure = Figure(figsize=(5, 4), dpi=100)
+        self.canvas = FigureCanvasTkAgg(self.figure, master=top)
 
         self.Label5 = tk.Label(top)
-        self.Label5.place(relx=0.341, rely=0.478, height=25, width=88)
+        self.Label5.place(relx=0.339, rely=0.472, height=47, width=205)
         self.Label5.configure(activebackground="#f9f9f9", activeforeground="black", background="#f4efe3",
-                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
+                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Graph''')
 
-        self.txtReddit = tk.Text(top)
+        self.txtReddit = tk.Text(top, state='disabled')
         self.txtReddit.place(relx=0.597, rely=0.093, relheight=0.35, relwidth=0.39)
-        self.txtReddit.configure(background="white", font="TkTextFont", foreground="black",
+        self.txtReddit.configure(background="white", font="-family {Segoe UI} -size 15", foreground="black",
                                  highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black",
                                  selectbackground="blue", selectforeground="white", wrap="word")
 
         self.Label3 = tk.Label(top)
-        self.Label3.place(relx=0.597, rely=0.037, height=25, width=320)
+        self.Label3.place(relx=0.597, rely=0.037, height=46, width=749)
         self.Label3.configure(activebackground="#f9f9f9", activeforeground="black", background="#ffa4a4",
-                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
+                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Reddit''')
 
-        self.txtTwitter = tk.Text(top)
+        self.txtTwitter = tk.Text(top, state='disabled')
         self.txtTwitter.place(relx=0.597, rely=0.519, relheight=0.389, relwidth=0.39)
-        self.txtTwitter.configure(background="white", font="TkTextFont", foreground="black",
+        self.txtTwitter.configure(background="white", font="-family {Segoe UI} -size 15", foreground="black",
                                   highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black",
                                   selectbackground="blue", selectforeground="white", wrap="word")
 
         self.Label4 = tk.Label(top)
-        self.Label4.place(relx=0.597, rely=0.463, height=25, width=317)
+        self.Label4.place(relx=0.597, rely=0.463, height=47, width=741)
         self.Label4.configure(activebackground="#f9f9f9", activeforeground="black", background="#e3f8fb",
-                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
+                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Twitter''')
 
         self.txtSearch = tk.Entry(top)
         self.txtSearch.place(relx=0.012, rely=0.019, relheight=0.076, relwidth=0.403)
+        self.txtSearch.configure(font="-family {Segoe UI Black} -size 15 -weight bold")
 
         self.btnSearch = tk.Button(top)
         self.btnSearch.place(relx=0.426, rely=0.019, height=44, width=87)
-        self.btnSearch.configure(activebackground="#fafeda", activeforeground="#000000", background="#00BFA5",
-                                 disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
-                                 foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0",
+        self.btnSearch.configure(activebackground="#fafeda", activeforeground="#000000", background="#f4ecbd",
+                                 disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
+                                 foreground="#000000", highlightbackground="#d9d9d9",
+                                 highlightcolor="black", pady="0",
                                  text='''Search''')
 
         self.btnQuit = tk.Button(top)
-        self.btnQuit.place(relx=0.914, rely=0.926, height=24, width=47)
+        self.btnQuit.place(relx=0.927, rely=0.934, height=44, width=117)
         self.btnQuit.configure(activebackground="#ececec", activeforeground="#000000", background="#f2bfcd",
-                               disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
+                               disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                                foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0",
                                text='''Quit''')
 
@@ -202,18 +199,17 @@ class Toplevel1:
         showSearchHistory(self)
 
         self.sysLabel = tk.Label(top)
-        self.sysLabel.place(relx=0.012, rely=0.111, height=21, width=334)
+        self.sysLabel.place(relx=0.012, rely=0.111, height=40, width=781)
         self.sysLabel.configure(activebackground="#f9f9f9", activeforeground="black",anchor='w',background="#f4efe3",
-                                disabledforeground="#a3a3a3",font="-family {Segoe UI} -size 9 -slant italic",
+                                disabledforeground="#a3a3a3",font="-family {Segoe UI} -size 15 -slant italic",
                                 foreground="#eb3034",highlightbackground="#d9d9d9",highlightcolor="black",justify='left')
 
-        self.cBoxGraph = ttk.Combobox(top, state='readonly', value=["1","2","30"]) #PLACEHOLDER
+        self.cBoxGraph = ttk.Combobox(top, state='readonly') #PLACEHOLDER
         self.cBoxGraph.place(relx=0.219, rely=0.926, relheight=0.039, relwidth=0.074)
         self.cBoxGraph.configure(takefocus="")
-        self.cBoxGraph.bind("<<ComboboxSelected>>", lambda _: displayDay(self))
 
         self.gphLabel = tk.Label(top)
-        self.gphLabel.place(relx=0.305, rely=0.926, height=21, width=353)
+        self.gphLabel.place(relx=0.305, rely=0.926, height=39, width=825)
         self.gphLabel.configure(anchor='w',background="#f4efe3",disabledforeground="#a3a3a3",foreground="#000000")
 
 
@@ -225,19 +221,127 @@ red = redditCrawler()
 twit = twitterCrawler()
 de = dataExport()
 
-def displayDay(self):
-    date = self.cBoxGraph.get()
-    self.gphLabel.configure(text="Displaying posts from " + str(date))
-    if(self.cBoxGraph.get()=='16-03-2021'):
-        print("Selected the right date!")
-        #Display the day's posts and tweets
+dayArray, commentArray, upvotesArray, retweetsArray, likesArray = [], [], [], [], []
 
+def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesArray):
+    """A function to call twitter crawler search function to return the list of Mydata objects
+
+            Args:
+                dayArray : arr
+                    the array containing the date ranges within the week of crawling
+                commentsArray : arr
+                    the array containing respective days' number of comments
+                upvotesArray : arr
+                    the array containing respective days' number of upvotes
+                retweetsArray : arr
+                    the array containing respective days' number of retweets
+                likesArray : arr
+                    the array containing respective days' number of likes
+
+    """
+    self.canvas.get_tk_widget().place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
+
+    # Clears graph before plotting to prevent appending two graphs at once
+    self.figure.clear()
+    # self.figure.
+    plt = self.figure.add_subplot(1, 1, 1)
+    x = []
+    max_log_size = 5000
+    for i in dayArray:
+        i = ''.join(i.split())
+        i = i[:-5]
+        x.append(i)
+    print(x)
+
+    # now there's 3 sets of points
+    yCO = commentsArray
+    yUV = upvotesArray
+    yRT = retweetsArray
+    yLK = likesArray
+
+    if max(yCO)>=max_log_size or max(yUV)>=max_log_size or max(yRT)>=max_log_size or max(yLK)>=max_log_size:
+        plt.set(yscale="log")
+    plt.plot(x, yCO, label='Comments', marker='o', color='red')
+    plt.plot(x, yUV, label='Upvotes', marker='o', color='#fa93b0')
+    plt.plot(x, yRT, label='Retweets', marker='o', color='#2374f7')
+    plt.plot(x, yLK, label='Likes', marker='o', color='#accafa')
+
+    plt.legend()
+    self.figure.canvas.draw()
+
+def displayDay(self, redResult, twitResult):
+    """A function to display the posts and tweets based on the comboBox value date
+
+        Args:
+            redResult : List
+                the list of Mydata object which each contains reddit posts crawled for the respective days of the week
+            twitResult : List
+                the list of Mydata object which each contains twitter tweets crawled for the respective days of the week
+
+    """
+    date = self.cBoxGraph.get()
+    date_obj = datetime.strptime(date, '%d-%m-%Y')
+    date_obj = date_obj.strftime("%Y-%m-%d")
+    date = str(date_obj)
+
+    self.txtReddit.configure(state='normal')
+    self.txtTwitter.configure(state='normal')
+
+    if(self.cBoxGraph.get()!=''):
+        self.txtReddit.delete("1.0", 'end')
+        self.txtTwitter.delete("1.0", 'end')
+        #Display the day's posts and tweets
+        for myRedData in redResult:
+            for post in myRedData.getTopComments():
+                if date in str(post['date']):
+                    print(post['text'])
+                    self.txtReddit.insert(tk.END, "\nPost: \n" + post['text'])
+                    self.txtReddit.insert(tk.END, "\n\nRead More: " + post['url'])
+                    self.txtReddit.insert(tk.END, "\n\nPosted On: " + str((post['date'])))
+                    self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
+        for myTwit in twitResult:
+            for tweet in myTwit.getTopComments():
+                if date in str(tweet['date']):
+                    print(tweet['text'])
+                    self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet['text'])
+                    self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet['url'])
+                    self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str((tweet['date'])))
+                    self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
+
+        if self.txtTwitter.compare("end-1c", "==", "1.0"):
+            self.txtTwitter.insert(tk.END, "No tweets found on this day!")
+        if self.txtReddit.compare("end-1c", "==", "1.0"):
+            self.txtReddit.insert(tk.END, "No posts found on this day!")
+
+    self.gphLabel.configure(text="Displaying results from " + str(date))
+    self.txtReddit.configure(state='disabled')
+    self.txtTwitter.configure(state='disabled')
 
 def show_entry_fields(self):
+    """A function to initialise elements in TKinter GUI and main functions for the program
+
+    Attributes:
+        redResult : list
+            to store list of Mydata objects of posts returned from crawler APIs
+        twitResult : list
+            to store list of Mydata objects of tweets returned from crawler APIs
+        err : str
+            to store exception error messages
+
+    """
     strInput = self.txtSearch.get()
     redResult = ''
     twitResult = ''
-    
+
+    self.cBoxGraph.bind("<<ComboboxSelected>>", lambda _: displayDay(self, redResult, twitResult))
+
+    if len(dayArray)!=0 or len(commentArray)!=0 or len(upvotesArray)!=0 or len(retweetsArray)!=0 or len(likesArray)!=0:
+        dayArray.clear()
+        commentArray.clear()
+        upvotesArray.clear()
+        retweetsArray.clear()
+        likesArray.clear()
+
     if len(strInput) == 0:
         self.sysLabel.configure(text='Field is empty! Please enter a search term.')
     else:
@@ -246,16 +350,22 @@ def show_entry_fields(self):
         self.lblUpvotes.configure(text='')
         self.lblRetweets.configure(text='')
         self.lblLikes.configure(text='')
-        
         err = ''
-        try: 
+        try:
+            self.txtReddit.configure(state='normal')
+            self.txtTwitter.configure(state='normal')
             redResult = redditCrawl(self, strInput)
+            displayRedditPosts(self, redResult)
             twitResult = twitterCrawl(self, strInput)
+            displayTwitterTweets(self, twitResult)
+            plotGraph(self, dayArray, commentArray, upvotesArray, retweetsArray, likesArray)
+            self.txtReddit.configure(state='disabled')
+            self.txtTwitter.configure(state='disabled')
             saveQuery(self, strInput)
         except Exception as e:
             err = e
             print('Exception at show_entry_fields: ' + str(e))
-        
+
         if (err == ''):
             try:
                 de.exportData(redResult, strInput)
@@ -264,54 +374,108 @@ def show_entry_fields(self):
                 print('Exception at exporting data: ' + str(e))
 
 def twitterCrawl(self, strInput):
+    """A function to call twitter crawler search function to return the list of Mydata objects
+
+    Args:
+        strInput : str
+            the topic or input searched by the user.
+
+    Attributes:
+        strVal : str
+            obtain the field on the UI that contains all twitter tweets
+
+    """
     strVal = self.txtTwitter.get("1.0", 'end')
     if (strVal.strip()):
         self.txtTwitter.delete("1.0", 'end')
-
-    strInput = self.txtSearch.get()
     twitResult = twit.search(strInput)
+    return twitResult
+
+def displayTwitterTweets(self, twitResult):
+    """A function to display Twitter tweets and interaction counts on the TKinter elements
+
+    Args:
+        twitResult : List
+            the list of Mydata object which each contains twitter tweets crawled for the respective days of the week
+
+    Attributes:
+        twitterCCount : int
+            to keep count of number of tweets for all tweets displayed for the week
+        twitterICount : int
+            to keep count of number of likes for all tweets displayed for the week
+
+    """
+    strVal = self.txtTwitter.get("1.0", 'end')
+    if (strVal.strip()):
+        self.txtTwitter.delete("1.0", 'end')
     twitterCCount = 0
     twitterICount = 0
-    retweetsArray = []
-    likesArray = []
 
     for myTwitData in twitResult:
         retweetsArray.append(myTwitData.commentCount)
         likesArray.append(myTwitData.interactionCount)
         twitterCCount += myTwitData.commentCount  # RETWEETS
         twitterICount += myTwitData.interactionCount  # LIKES
+        self.txtTwitter.insert(tk.END, "\n===============================================")
         for tweet in myTwitData.getTopComments():
             if 'twitter' in tweet.url.lower():
                 self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.text)
                 self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.url)
-                self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(myTwitData.date))
+                self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(tweet.date))
                 self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
     self.lblRetweets.configure(text="Retweets: " + str(twitterCCount))
     self.lblLikes.configure(text="Likes: " + str(twitterICount))
-    print(retweetsArray)
-    print(likesArray)
-    return twitResult
 
 def redditCrawl(self, strInput):
+    """A function to call reddit crawler search function to return the list of Mydata objects
+
+    Args:
+        strInput : str
+            the topic or input searched by the user.
+
+    Attributes:
+        str3Val : str
+            obtain the field on the UI that contains all reddit posts
+
+    """
     str3Val = self.txtReddit.get("1.0", 'end')
     if (str3Val.strip()):
         self.txtReddit.delete("1.0", 'end')
-
     redResult = red.search(strInput)
+    return redResult
+
+
+
+
+def displayRedditPosts(self, redResult):
+    """A function to display Reddit posts and interaction counts on the TKinter elements
+
+    Args:
+        redResult : List
+            the list of Mydata object which each contains reddit posts crawled for the respective days of the week
+
+    Attributes:
+        redditCCount : int
+            to keep count of number of comments for all posts displayed
+        redditICount : int
+            to keep count of number of upvotes for all posts displayed
+        dayArray : arr
+            to keep track of the list of dates returned in redResult to be used for combobox values loading
+
+    """
+    str3Val = self.txtReddit.get("1.0", 'end')
+    if (str3Val.strip()):
+        self.txtReddit.delete("1.0", 'end')
     redditCCount = 0
     redditICount = 0
-    commentArray = []
-    upvotesArray = []
-    dayArray = []
 
-
-    minDate = ''
     for myRedData in redResult:
         commentArray.append(myRedData.commentCount)
         upvotesArray.append(myRedData.interactionCount)
         redditCCount += myRedData.commentCount  # COMMENTS
         redditICount += myRedData.interactionCount  # UPVOTES
-        dayArray.append(myRedData.date.strftime("%d-%m-%Y"))
+        dayArray.append(myRedData.date)
+        self.txtReddit.insert(tk.END, "\n===============================================")
         for post in myRedData.getTopComments():
             if myRedData.source == "reddit":
                 self.txtReddit.insert(tk.END, "\nPost: \n" + post.text)
@@ -320,15 +484,23 @@ def redditCrawl(self, strInput):
                 self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
     self.lblComments.configure(text="Comments: " + str(redditCCount))
     self.lblUpvotes.configure(text="Upvotes: " + str(redditICount))
+
+    #Populate combobox with values consisting of dates from the posts.
     self.cBoxGraph.config(values=dayArray)
-    print(commentArray)
-    print(upvotesArray)
-    print(dayArray)
     self.gphLabel.configure(text="Displaying posts from " + str(min(dayArray)) + " to " + str(max(dayArray)))
 
-    return redResult
+
 
 def showSearchHistory(self):
+    """A function to display previous user searches to UI
+
+    Attributes:
+        field : Tkinter's Text()
+            obtains the text in the field on the UI that contains all previous searches
+        hist : list
+            contains user's previous searches
+
+    """
     field = self.txtSearchHistory
     hist = de.getSearchHist()
 
@@ -340,8 +512,22 @@ def showSearchHistory(self):
             field.insert(tk.END, items + "\n")
     field.config(state='disabled')
 
-
 def saveQuery(self, query):
+    """A function to add new user's search to file
+
+    Args:
+        query : str
+            the topic or input searched by the user.
+
+    Attributes:
+        items_temp : arr
+            temp array to store all previous and current searches before writing to file
+        field : txtBox
+            obtain the field on the UI that contains all previous searches
+        index : int
+            to keep count of current for loop's iteration count
+
+    """
     items_temp = []
     field = self.txtSearchHistory  # Initialise Search History textbox as 'field'
     field.config(state='normal')  # Enable 'field' for editing (removing and adding texts)

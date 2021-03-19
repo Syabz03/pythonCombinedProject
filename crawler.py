@@ -58,6 +58,8 @@ class redditCrawler(crawler):
 
     def search(self, input):
         """ Searches using the reddit API for the past week for the related topic
+        by attempting to find a related subreddits to the topic then searching within 
+        the related subreddits
         Args:
             input (str): Topic that will be searched for
 
@@ -65,11 +67,14 @@ class redditCrawler(crawler):
             list: a list 7 mydata Objects representing the past week of data on the topic on reddit
         
         Notes:
+            in the case of a very small or no results
             we are relying on reddit sorting system therefore unrelated posts might come up
             i.e. "GPU" might come up in a escape from tarkov post cause of an in game item
+            i.e. no posts found, reddit returns random results
         """
         super().search(input)
-        multiReddit = self.reddit.subreddits.search(self.topic, limit=5)
+        self.data=[]
+        multiReddit = self.reddit.subreddits.search(self.topic, limit=10)
         for subr in multiReddit:  # get related subreddits
             print("----------------------------------------------------------------------------")
             print(subr.display_name)
@@ -82,9 +87,8 @@ class redditCrawler(crawler):
                 else:
                     # if subreddit name does not contains topic
                     self.subRedditPost.append(subr.search(self.topic, sort='top', time_filter='week', limit=100))
-            except error.HTTPError as e:
-                if e.code == 403:
-                    print("not allowed to view trafic")
+            except:
+                print("not allowed to view trafic")
 
         self._format()
 
@@ -98,6 +102,30 @@ class redditCrawler(crawler):
         # print("comment count:",submission.num_comments)
         # commentTree = submission.comments
         # print("comment 1",commentTree[0].body)
+
+    def generalSearch(self,input):
+        """ Searches using the reddit API for the past week for the related topic in all of reddit
+
+        Args:
+            input (str): Topic that will be searched for
+
+        Returns:
+            list: a list 7 mydata Objects representing the past week of data on the topic on reddit
+        
+        Notes:
+            in the case of a very small or no results
+            we are relying on reddit sorting system therefore unrelated posts might come up
+            i.e. "GPU" might come up in a escape from tarkov post cause of an in game item
+            i.e. no posts found, reddit returns random results
+        """
+        try:
+            self.subRedditPost = []
+
+            self.subRedditPost.append(self.reddit.subreddit("all").search(input,'top',limit=100,time_filter='week'))
+        except :
+            print("not allowed to view trafic")
+        self._format()
+        return self.data
 
     def _format(self):
         # 1 week = 604800
@@ -124,9 +152,8 @@ class redditCrawler(crawler):
                         day6.append(submission)
                     else:
                         day7.append(submission)
-            except error.HTTPError as e:
-                if e.code == 403:
-                    print("not allowed to view trafic")
+            except:
+                print("not allowed to view trafic")
         week.append(list(day1))  # oldest
         week.append(list(day2))
         week.append(list(day3))
@@ -138,12 +165,16 @@ class redditCrawler(crawler):
         for d in week:
             n = n + len(d)
         print(n, " post crawled")
+        if n == 0:
+            self.generalSearch(self.topic)
+            pass
 
         
         n = 6
         # get data from the day's post
         for day in week:
             date = datetime.now() - timedelta(days=n)
+            date = date.strftime("%d-%m-%Y")
             day_summary = Mydata(self.topic, 'reddit', date)
             top3 = []
             low = 0
@@ -204,8 +235,46 @@ class redditCrawler(crawler):
 
 
 class twitterCrawler(crawler):
+    """
+    A class that inherits from the crawler class for crawling Twitter
+
+    Attributes
+    ----------
+    topthree : object list
+        
+    stores the top three tweets of a day. One element in the list represents a day
+
+    Methods
+    -------
+    search(input)
+        
+    searches 50 tweets per day from the past week using the API for the topic given
+    """
 
     def __init__(self):
+        """
+        Parameters
+        ----------
+        consumer_key : str
+            
+        twitter account key for creating OAuth1a authentication with Twitter
+        
+        consumer_secret : str
+            
+        twitter account secret key for creating OAuth1a authentication with Twitter
+        
+        access_token : str
+            
+        twitter account access token for generating access token from Twitter
+        
+        access_token_secret : str
+            
+        twitter account secret token for generating access token from Twitter
+        
+        api : API object
+            
+        stores API object for API methods
+        """
         consumer_key = "VpNVndPOykZXjQgfTg2RD21xz"
         consumer_secret = "1LyM7m5lTmNWwzUUSJF2kN04B5bZvRStY663PjNEnQRCS6b2QW"
         access_token = "1358367734417903620-liyj12fLuUrQGM09nsqiVqiAsFKuRc"
@@ -217,82 +286,146 @@ class twitterCrawler(crawler):
 
         self.api = tweepy.API(self.auth,
                               wait_on_rate_limit=True)  # Creating the API object while passing in auth information
+        
 
     def search(self,input):
-        self.data = []
-        self.topthree = []
-        self.topic = input
+        """
+        searches 50 tweets per day within the week using the API for the topic given
+        
+        Parameters
+        ----------
+        input : str
+            
+        the topic to be searched
 
-        tweet_limit = 50
+        Returns
+        -------
+        list
+            
+        a list of size 7 mydata objects containing a list of 3 top posts, a total retweet count and a total like count
+        """
+        self.data = [] # The data to be returned
+        #self.topic = input
+        self.topids = [] # Store every id of top tweets
 
-        # For loop to change target day, api searches for tweets of the day before
+        tweet_limit = 50 #Controls the number of tweets to search for a day
+
+        # For loop to change target day, api searches for tweets
         # The until tag returns tweets created before the given date. I.e. -1 for today, 6 for 6 days before (Total 7 days)
+        # Twitter API does not have the ability to search for tweets of a single day, so this method is used to give the closest representation
         for n in range(-1, 6):
             day = datetime.now() - timedelta(days=n)
             results = self.api.search(q=f"{input} -filter:replies -filter:retweets", result_type="mixed", count=tweet_limit, until=day.strftime("%Y-%m-%d")) # Find tweets for that day
             
-            #self.top(results)
+            self.format(results, day) # Format the search result block of that day
 
-            self.format(results, day)
-
-        # Temp tweet print function
+        # Print section for checking
         print("\n========================================Twitter Result===========================================\n")
-    
+        
         for n in range(0, 7):
-    
-           print(f"Day {n+1})\n")
-    
-           #for i in range(tweet_limit):
-           #
-           #    print(self.data[n].topComments[i].text)
-           #    print(self.data[n].topComments[i].url)
-           #    print()
-    
-           print("Total retweets: " + str(self.data[n].commentCount))
-           print("Total likes: " + str(self.data[n].interactionCount))
-           print()
+        
+            print(f"Day {n+1})\n")
+        
+            for i in range(len(self.data[n].topComments)):
+            
+               print(self.data[n].topComments[i].text)
+               print(self.data[n].topComments[i].url)
+               print()
+        
+            print("Total retweets: " + str(self.data[n].commentCount))
+            print("Total likes: " + str(self.data[n].interactionCount))
+            print()
            
         return self.data
 
     def format(self, block, day):
-        # super().format(block)
-
-        temp = Mydata(self.topic, 'Twitter', day)
+        """
+        takes the results of a particular day and totals the like/retweet counts for that day, while also storing the top tweets
         
-        # if len(temp.getTopComments()) != 0:
-        #     temp.getTopComments().clear()
-        
-        maxlike = [0, 0, 0]
+        Parameters
+        ----------
+        block : SearchResults object
+            
+        the block of tweets returned by twitter's API to be looked through
 
-        # Go through tweets and combine the interaction data into 1 number for 1 day
+        day : datetime.date
+
+        the date used to search the API
+        """
+
+        daywidth = 2 # Width of days accepted into top tweets list
+
+        # The day limit for search results
+        # -8 hours to align with UTC timezone that twitter tweets use
+        # Any tweets before this day should not be considered
+        # Basically narrowing the tweet results to be within 24*daywidth hours of the day used to search
+        beforelimit = (day - timedelta(days=daywidth+1, hours=8)).replace(microsecond=0) # Limit of earliest tweet
+        afterlimit = (day - timedelta(days=1, hours=8)).replace(microsecond=0)  # Limit of latest tweet
+
+        temp = Mydata(self.topic, 'Twitter', day) # temporary mydata object to be appended to self.data after tallying everything
+        lowest = 0 # lowest like count of a tweet
+        toptweets = []
+
+        # Go through tweets and combine the interaction data for 1 day
         for tweet in block:
-            url = f"https://twitter.com/i/web/status/{tweet.id}"
-            temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
-
+            
+            #Prevent searching if API did not get any search results
+            #if tweet.text is None:
+            #    print("No search results for Twitter")
+            #    return
 
             temp.addLikeCount(tweet.favorite_count)
             temp.addCommentCount(tweet.retweet_count)
 
-            # Check if the post's like count is higher than the current top three 
-            for i in maxlike:
-                if i < tweet.favorite_count:
-                    # After replacing immediately break out, so it does not fill the same value into every element of the array
-                    i = tweet.favorite_count
-                    break
+            # Deny tweets that are not within the same day from entering top tweets
+            # DISABLED as the tweet count for a day is not be enough to populate top tweets list
+            #if tweet.created_at > afterlimit or tweet.created_at < beforelimit:
+            #    continue
+
+            if len(toptweets) < 3 and tweet.id not in self.topids:
+                # Top tweets list has not been populated yet, just add
+                toptweets.append(tweet)
+                self.topids.append(tweet.id)
+            elif tweet.favorite_count > lowest and tweet.id not in self.topids:
+                # When exceeding 3 top tweets, add new and remove tweet with lowest like count
+                lowest, toptweets = self.sortTop(tweet, toptweets)
+
+        for tweet in toptweets:
+
+            # Add top three tweets to object to be returned
+            url = f"https://twitter.com/i/web/status/{tweet.id}"
+            temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
 
         self.data.append(temp)
 
-        #temptop = Mydata(self.topic, 'Twitter', day)
-        # Go through tweets again to find top three tweets
-        for i in maxlike:
-            for tweet in block:
-            
-                if tweet.favorite_count is i:
-                    
-                    url = f"https://twitter.com/i/web/status/{tweet.id}"
-                    #temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
-                    
-                    self.topthree.append(Post(tweet.text, tweet.id, url, day))
+    def sortTop(self, tweet, toptweets):
+        """
+        sorts the top tweets and removes the tweet with the lowest like count
 
-    #Get top 3 post for day
-    #def top(self, block):
+        Parameters
+        ----------
+        tweet : tweet object
+            
+        a single tweet from API search
+
+        toptweets : list
+
+        list of top tweets
+        """
+
+        toptweets.append(tweet) # Append the tweet into list of top 3 tweets
+        self.topids.append(tweet.id) # Remember every id of any added tweet
+        
+        toptweets.sort(key=lambda x: x.favorite_count) # Sort by like count
+
+        # Since this method is called when the list is equal or greater than 3, the least popular tweet has to be removed
+        removetweet = toptweets.pop(0)
+
+        # Remove the id of the tweet being removed from the top three
+        if removetweet.id in self.topids:
+            self.topids.remove(removetweet.id)
+
+        lowest = toptweets[0].favorite_count
+
+        return lowest, toptweets
+    
