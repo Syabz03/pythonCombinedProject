@@ -2,27 +2,25 @@ import unittest
 import json
 from JSONExport import *
 
-"""A class to test that reading and writing of data to JSON files works as intended
-
-"""
-
 class testExport(unittest.TestCase):
-    
-    """A function to test writing and reading of sample data using functions in JSONExport.py 
+    """A class to test that reading and writing of data to JSON files works as intended
 
-    Attributes:
-        de : str
-            name of file to be read by the program and store the values to variable 'cur_data'
-        sample_json : dict 
-            sample json data to be written to a test file and to be used for comparison
-        file_name : str
-            name of file to be read/write
-        json_data : dict
-            json data from file name in variable 'file_name' read by function 'read_json'
-    
     """
 
     def test_read_write(self):
+        """A function to test writing and reading of sample data using functions in JSONExport.py 
+
+        Attributes:
+            de : str
+                name of file to be read by the program and store the values to variable 'cur_data'
+            sample_json : dict 
+                sample json data to be written to a test file and to be used for comparison
+            file_name : str
+                name of file to be read/write
+            json_data : dict
+                json data from file name in variable 'file_name' read by function 'read_json'
+        
+        """
         de = dataExport()
         sample_json = {
                         "topic": "Hello",
@@ -51,61 +49,61 @@ class testExport(unittest.TestCase):
                             }
                         ]
                     }
-        file_name = 'tests/data/Hello_reddit_data.json'
+        file_name = 'tests/data/Hello_data.json'
         de.write_json(sample_json, file_name)
         json_data = de.read_json(file_name)
 
         self.assertEquals(sample_json,json_data, msg='value is different')
 
-    """A function to test that there is 3 data in topComments field of the json data in the file  
-
-    Attributes:
-        de : str
-            name of file to be read by the program and store the values to variable 'cur_data'
-        sample_json : dict 
-            sample json data to be written to a test file and to be used for comparison
-        file_name : str
-            name of file to be read from
-        json_data : dict
-            json data from file name in variable 'file_name' read by function 'read_json'
-        tcLength : int 
-
-    """
-
     def test_top_comments_count(self):
+        """A function to test that there is 3 data in topComments field of the json data in the file  
+
+        Attributes:
+            de : str
+                name of file to be read by the program and store the values to variable 'cur_data'
+            sample_json : dict 
+                sample json data to be written to a test file and to be used for comparison
+            file_name : str
+                name of file to be read from
+            json_data : dict
+                json data from file name in variable 'file_name' read by function 'read_json'
+            tcLength : int 
+
+        """
+
         de = dataExport()
-        file_name = 'tests/data/Hello_reddit_data.json'
+        file_name = 'tests/data/Hello_data.json'
         json_data = de.read_json(file_name)
         tcLength = len(json_data['topComments'])
 
-        self.assertEquals(tcLength,3)
-
-    """A function to test that 'source' and 'url' field of the json data in the file tallies 
-
-    Attributes:
-        de : str
-            name of file to be read by the program and store the values to variable 'cur_data'
-        sample_json : dict 
-            sample json data to be written to a test file and to be used for comparison
-        file_name : str
-            name of file to be read from
-        json_data : dict
-            json data from file name in variable 'file_name' read by function 'read_json'
-        tcLength : int 
-    
-    Notes:
-        Example: source - twitter, url - twitter
-
-    """
+        self.assertEquals(tcLength,3, msg='length is not 3')
 
     def test_url_and_source(self):
+        """A function to test that 'source' and 'url' field of the json data in the file tallies 
+
+        Attributes:
+            de : str
+                name of file to be read by the program and store the values to variable 'cur_data'
+            sample_json : dict 
+                sample json data to be written to a test file and to be used for comparison
+            file_name : str
+                name of file to be read from
+            json_data : dict
+                json data from file name in variable 'file_name' read by function 'read_json'
+            tcLength : int 
+        
+        Notes:
+            Example: source - twitter, thus url should contain twitter value.
+
+        """
+
         de = dataExport()
-        file_name = 'tests/data/Hello_reddit_data.json'
+        file_name = 'tests/data/Hello_data.json'
         json_data = de.read_json(file_name)
-        source = json_data['source']
+        source = json_data['source'] + '.com'
         url = json_data['topComments'][0]['url']
 
-        self.assertIn(source, url)
+        self.assertIn(source, url, msg='Post is from a different source!')
 
 if __name__ == '__main__':
     unittest.main()

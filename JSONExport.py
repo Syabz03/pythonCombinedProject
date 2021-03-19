@@ -1,6 +1,7 @@
 import json
 import dateparser as dp
 from pathlib import Path
+from datetime import date
 
 class dataExport():
     """A class to be called by main.py for exporting of crawled data to a json file
@@ -36,52 +37,52 @@ class dataExport():
     searchHist_file = path + "user_search_hist.json"
     check_hist_file = Path(searchHist_file)
 
-    """A function to write data that is passed to the function to a file 
-
-    Args:
-        data : dict
-            contains the crawled data
-        filename: str
-            name for the file to be saved as by the program
-    
-    """
-
     def write_json(self, data, filename): # Function to add to JSON
+        """A function to write data that is passed to the function to a file 
+
+        Args:
+            data : dict
+                contains the crawled data
+            filename: str
+                name for the file to be saved as by the program
+        
+        """
+
         with open(filename, 'w') as f:
             json.dump(data, f)
     
-    """A function to read data from a file that has the given filename
-
-    Args:
-        filename : str
-            name of file to be read by the program and store the values to variable 'cur_data'
-    
-    Return:
-        cur_data : list
-            list of all data in the file
-    
-    """
-
     def read_json(self, filename):
+        """A function to read data from a file that has the given filename
+
+        Args:
+            filename : str
+                name of file to be read by the program and store the values to variable 'cur_data'
+        
+        Return:
+            cur_data : list
+                list of all data in the file
+        
+        """
+
         with open(filename, 'r') as json_file:
             cur_data = json.load(json_file)
             return cur_data  
 
-    """A function to get user's previous searches and return it to the caller
-
-    Attributes:
-        hist_temp : dict
-            contains the crawled data
-        hist_arr : list
-            name for the file to be saved as by the program
-
-    Returns:
-        hist_arr : list
-            list of past user searches
-    
-    """
-
     def getSearchHist(self): # Function to get user's search history from file to show on UI
+        """A function to get user's previous searches and return it to the caller
+
+        Attributes:
+            hist_temp : dict
+                contains the crawled data
+            hist_arr : list
+                name for the file to be saved as by the program
+
+        Returns:
+            hist_arr : list
+                list of past user searches
+        
+        """
+
         hist_temp = {}
         hist_arr = []
         
@@ -91,7 +92,7 @@ class dataExport():
                 if hist_temp: hist_arr = hist_temp['search']
 
             except Exception as e:
-                print('Get Search History - Exception: ' + str(e))
+                print('[JSONExport] Get Search History - Exception: ' + str(e))
             
         elif not self.check_hist_file.is_file(): 
             print("No Search History ")
@@ -99,56 +100,63 @@ class dataExport():
         
         return hist_arr # Return search history from file 
 
-    """A function to add new user search to file
-
-    Args:
-        queryList : list
-            list of queries shown on the UI
-
-    Attributes:
-        hist_temp : dict
-            to store data in queryList as value to a dict key 'search'
-    
-    """
-
     def addSearchHist(self, queryList): # Function to save user's search query to JSON file # Add current search query to data file for future reference
+        """A function to add new user search to file
+
+        Args:
+            queryList : list
+                list of queries shown on the UI
+
+        Attributes:
+            hist_temp : dict
+                to store data in queryList as value to a dict key 'search'
+        
+        """
+
         hist_temp = {}
         hist_temp['search'] = queryList # Insert list of query from Search History text box to hist_temp dictionary
         self.write_json(hist_temp, self.searchHist_file) # Call write_json function to store items in hist_temp to specified file
 
-    """A function to export crawled data to a JSON file
-
-    Args:
-        data : dict
-            contains the crawled data
-        topic : str
-            user's current search query
-
-    Attributes:
-        data_temp : list
-            to store 'Mydata' object's items
-        posts_temp : list
-            to store all posts that was crawled
-        ids : list
-            to store all ids of posts in the current '_post.json' file (if available)
-        source : str
-            get the source of the data (either Reddit or Twitter)
-        data_file : str 
-            name for the file to be saved as by the program
-        posts_file : str
-            name for the file to be saved as by the program
-        check_d_file : Path()
-            use function Path() for the program to find the path 'data_file' and return to the variable 'check_d_file'
-        check_p_file : Path()
-            use function Path() for the program to find the path 'posts_file' and return to the variable 'check_p_file'
-    
-    """
-
     def exportData(self, data, topic): # Save data to file, according to source (Reddit or Twitter)
+        """A function to export crawled data to a JSON file
+
+        Args:
+            data : dict
+                contains the crawled data
+            topic : str
+                user's current search query
+
+        Attributes:
+            data_temp : list
+                to store 'Mydata' object's items
+            posts_temp : list
+                to store all posts that was crawled
+            dates_temp : list
+                to store all dates of data in the current '_data.json' file (if available) for comparison to insert new entry or not
+            ids_temp : list
+                to store all ids of posts in the current '_post.json' file (if available) for comparison to insert new entry or not
+            source : str
+                get the source of the data (either Reddit or Twitter)
+            data_file : str 
+                name for the file to be saved as by the program
+            posts_file : str
+                name for the file to be saved as by the program
+            check_d_file : Path()
+                use function Path() for the program to find the path 'data_file' and return to the variable 'check_d_file'
+            check_p_file : Path()
+                use function Path() for the program to find the path 'posts_file' and return to the variable 'check_p_file'
+        
+        """
+
         data_temp = []
         posts_temp = []
-        ids = []
+        dates_temp = [] # store data's dates for comparison to insert new entry or not
+        ids_temp = []  # store posts's ids for comparison to insert new entry or not
         
+        # get current date
+        today = date.today()
+        curr_date = today.strftime("%Y-%m-%d")
+
         source = str(data[0].source) # get the source (either reddit or twitter)
         # print(topic, source) # print for verification
         data_file = self.path + topic + "_" + source + "_data.json" 
@@ -161,32 +169,45 @@ class dataExport():
         if not check_p_file.is_file(): self.write_json(data_temp, posts_file)
 
         try:
-            cur_data = self.read_json(posts_file)
-            posts_temp = cur_data
-            for id in posts_temp: ids.append(id['id'])
-        except Exception as e:
-            print('Exception: ' + str(e))
+            cur_data = self.read_json(data_file)
+            if cur_data:
+                data_temp = [i for i in cur_data if not (i['date'] == curr_date)] # ensure that current date's data is a new set of data
+                for dates in data_temp: dates_temp.append(dates['date'])
 
-        id = set(ids)
+            cur_posts = self.read_json(posts_file)
+            if cur_posts:
+                posts_temp = cur_posts
+                for ids in posts_temp: ids_temp.append(ids['id'])
+        except Exception as e:
+            print('[JSONExport] Reading JSON gave Exception: ' + str(e))
+
+        id_set = set(ids_temp)
+        date_set = set(dates_temp)
         for submission in data:
             to_dict = vars(submission)
             to_dict['date'] = str(dp.parse(str(to_dict['date']))).split()[0]
-            top_com = []
 
-            tc = submission.getTopComments()
-            for posts in tc:
-                posts_dict = vars(posts)
-                posts_dict['date'] = str(dp.parse(str(posts_dict['date'])))
-
-                if source.lower() in posts_dict['url'].lower() and posts_dict['id'] not in id:
-                    posts_temp.append(posts_dict)
+            if to_dict['date'] not in date_set: #check if date's data has been inserted to JSON file before, if not then insert it
+                top_com_temp = []
+                tc = submission.getTopComments()
                 
-                top_com.append(posts_dict) 
+                for posts in tc:
+                    posts_dict = vars(posts)
+                    posts_dict['date'] = str(dp.parse(str(posts_dict['date'])))
 
-            to_dict['topComments'] = top_com
+                    if source.lower() in posts_dict['url'].lower() and posts_dict['id'] not in id_set:
+                        posts_temp.append(posts_dict)
+                    
+                    top_com_temp.append(posts_dict) 
 
-            if source.lower() == to_dict['source'].lower():
-                data_temp.append(to_dict)
+                top_com = sorted(top_com_temp, key=lambda k: k['date'], reverse=True) # sort top comments by date
+                to_dict['topComments'] = top_com
+
+                if source.lower() == to_dict['source'].lower():
+                    data_temp.append(to_dict)
         
-        self.write_json(posts_temp, posts_file)
-        self.write_json(data_temp, data_file)
+        posts_ls = sorted(posts_temp, key=lambda k: k['date'], reverse=True) # sort posts by date
+        data_ls = sorted(data_temp, key=lambda k: k['date'], reverse=True) # sort data by date
+        
+        self.write_json(posts_ls, posts_file)
+        self.write_json(data_ls, data_file)

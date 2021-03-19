@@ -4,7 +4,6 @@ import prawcore
 from abc import ABC, abstractmethod
 from mydata import *
 from datetime import datetime, timedelta, date
-from urllib import error
 
 class crawler(ABC):
 
@@ -20,6 +19,7 @@ class crawler(ABC):
     topic = ''
     data = []
 
+    @abstractmethod
     def __init__(self):
         pass
 
@@ -87,7 +87,7 @@ class redditCrawler(crawler):
                 else:
                     # if subreddit name does not contains topic
                     self.subRedditPost.append(subr.search(self.topic, sort='top', time_filter='week', limit=100))
-            except:
+            except: #unable to catch the 403 error with the python urllib error
                 print("not allowed to view trafic")
 
         self._format()
@@ -121,8 +121,8 @@ class redditCrawler(crawler):
         try:
             self.subRedditPost = []
 
-            self.subRedditPost.append(self.reddit.subreddit("all").search(input,'top',limit=100,time_filter='week'))
-        except :
+            self.subRedditPost.append(self.reddit.subreddit("all").search(input,sort='top',limit=100,time_filter='week'))
+        except : #unable to catch the 403 error with the python urllib error
             print("not allowed to view trafic")
         self._format()
         return self.data
@@ -152,7 +152,7 @@ class redditCrawler(crawler):
                         day6.append(submission)
                     else:
                         day7.append(submission)
-            except:
+            except: #unable to catch the 403 error with the python urllib error
                 print("not allowed to view trafic")
         week.append(list(day1))  # oldest
         week.append(list(day2))
