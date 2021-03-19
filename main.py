@@ -65,7 +65,7 @@ class Toplevel1:
         _ana1color = '#d9d9d9'  # X11 color: 'gray85'
         _ana2color = '#ececec'  # Closest X11 color: 'gray92'
 
-        top.geometry("821x540+695+284")
+        top.geometry("1920x1017")
         top.minsize(120, 1)
         top.maxsize(1924, 1061)
         top.resizable(1, 1)
@@ -74,119 +74,119 @@ class Toplevel1:
 
         self.txtSearchHistory = tk.Text(top)
         self.txtSearchHistory.place(relx=0.012, rely=0.278, relheight=0.631, relwidth=0.185)
-        self.txtSearchHistory.configure(background="white", font="TkTextFont", foreground="black",
+        self.txtSearchHistory.configure(background="white", foreground="black", font="-family {Segoe UI} -size 15",
                                         highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black",
                                         selectbackground="blue", selectforeground="white", wrap="word")
+
         self.Label1 = tk.Label(top)
-        self.Label1.place(relx=0.012, rely=0.222, height=25, width=142)
+        self.Label1.place(relx=0.012, rely=0.222, height=47, width=332)
         self.Label1.configure(activebackground="#f9f9f9", activeforeground="black", background="#f4efe3",
-                              font="-family {Segoe UI Black} -size 10 -weight bold", foreground="#000000",
+                              font="-family {Segoe UI Black} -size 15 -weight bold", foreground="#000000",
                               highlightbackground="#d9d9d9", highlightcolor="black", text='''Search History''')
 
         self.lblReddit = tk.Label(top)
-        self.lblReddit.place(relx=0.219, rely=0.222, height=27, width=284)
+        self.lblReddit.place(relx=0.219, rely=0.222, height=51, width=665)
         self.lblReddit.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
                                  background="#ffa4a4",disabledforeground="#a3a3a3",
-                                 font="-family {Segoe UI Black} -size 10 -weight bold", foreground="#000000",
+                                 font="-family {Segoe UI Black} -size 15 -weight bold", foreground="#000000",
                                  highlightbackground="#d9d9d9",highlightcolor="black")
         self.lblReddit.configure(text='''Reddit''')
 
         self.lblTwitter = tk.Label(top)
-        self.lblTwitter.place(relx=0.219, rely=0.352, height=27, width=283)
+        self.lblTwitter.place(relx=0.219, rely=0.352, height=51, width=663)
         self.lblTwitter.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
                                   background="#7ddeec",disabledforeground="#a3a3a3",
-                                  font="-family {Segoe UI Black} -size 10 -weight bold",
+                                  font="-family {Segoe UI Black} -size 15 -weight bold",
                                   foreground="#000000",highlightbackground="#d9d9d9",
                                   highlightcolor="black")
         self.lblTwitter.configure(text='''Twitter''')
 
         self.lblComments = tk.Label(top)
-        self.lblComments.place(relx=0.219, rely=0.259, height=21, width=284)
-        self.lblComments.configure(anchor='nw',background="#ffc4c4",disabledforeground="#a3a3a3",foreground="#000000")
+        self.lblComments.place(relx=0.219, rely=0.259, height=40, width=665)
+        self.lblComments.configure(anchor='nw',background="#ffc4c4",disabledforeground="#a3a3a3",foreground="#000000",font="-family {Segoe UI} -size 15")
         self.lblComments.configure(text='''Comments: -''')
 
         self.lblRetweets = tk.Label(top)
-        self.lblRetweets.place(relx=0.219, rely=0.389, height=21, width=283)
+        self.lblRetweets.place(relx=0.219, rely=0.389, height=39, width=663)
         self.lblRetweets.configure(activebackground="#f9f9f9",activeforeground="black",anchor='nw',background="#b9edf4",
-                                   disabledforeground="#a3a3a3",foreground="#000000",
+                                   disabledforeground="#a3a3a3",foreground="#000000",font="-family {Segoe UI} -size 15",
                                    highlightbackground="#d9d9d9",highlightcolor="black")
         self.lblRetweets.configure(text='''Retweets: -''')
 
         self.lblUpvotes = tk.Label(top)
-        self.lblUpvotes.place(relx=0.219, rely=0.296, height=21, width=284)
+        self.lblUpvotes.place(relx=0.219, rely=0.296, height=40, width=665)
         self.lblUpvotes.configure(activebackground="#f9f9f9",activeforeground="black",anchor='nw',
                                   background="#ffc4c4",disabledforeground="#a3a3a3",
-                                  font="-family {Segoe UI} -size 9",foreground="#000000",
+                                  font="-family {Segoe UI} -size 15",foreground="#000000",
                                   highlightbackground="#d9d9d9",highlightcolor="black")
         self.lblUpvotes.configure(text='''Upvotes: -''')
 
         self.lblLikes = tk.Label(top)
-        self.lblLikes.place(relx=0.219, rely=0.426, height=21, width=283)
+        self.lblLikes.place(relx=0.219, rely=0.426, height=40, width=663)
         self.lblLikes.configure(activebackground="#f9f9f9",activeforeground="black",
-                                anchor='nw',background="#b9edf4",disabledforeground="#a3a3a3",
+                                anchor='nw',background="#b9edf4",disabledforeground="#a3a3a3",font="-family {Segoe UI} -size 15",
                                 foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black")
         self.lblLikes.configure(text='''Likes: -''')
 
         self.Label2 = tk.Label(top)
-        self.Label2.place(relx=0.28, rely=0.167, height=25, width=197)
+        self.Label2.place(relx=0.28, rely=0.167, height=47, width=460)
         self.Label2.configure(activebackground="#f9f9f9", activeforeground="black", background="#f4efe3",
-                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
+                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
-                              text='''Interaction Count''')
-
+                              text='''Interaction Count for the week''')
 
         self.figure = Figure(figsize=(5, 4), dpi=100)
         self.canvas = FigureCanvasTkAgg(self.figure, master=top)
 
-
-
         self.Label5 = tk.Label(top)
-        self.Label5.place(relx=0.341, rely=0.478, height=25, width=88)
+        self.Label5.place(relx=0.339, rely=0.472, height=47, width=205)
         self.Label5.configure(activebackground="#f9f9f9", activeforeground="black", background="#f4efe3",
-                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
+                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Graph''')
 
         self.txtReddit = tk.Text(top, state='disabled')
         self.txtReddit.place(relx=0.597, rely=0.093, relheight=0.35, relwidth=0.39)
-        self.txtReddit.configure(background="white", font="TkTextFont", foreground="black",
+        self.txtReddit.configure(background="white", font="-family {Segoe UI} -size 15", foreground="black",
                                  highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black",
                                  selectbackground="blue", selectforeground="white", wrap="word")
 
         self.Label3 = tk.Label(top)
-        self.Label3.place(relx=0.597, rely=0.037, height=25, width=320)
+        self.Label3.place(relx=0.597, rely=0.037, height=46, width=749)
         self.Label3.configure(activebackground="#f9f9f9", activeforeground="black", background="#ffa4a4",
-                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
+                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Reddit''')
 
         self.txtTwitter = tk.Text(top, state='disabled')
         self.txtTwitter.place(relx=0.597, rely=0.519, relheight=0.389, relwidth=0.39)
-        self.txtTwitter.configure(background="white", font="TkTextFont", foreground="black",
+        self.txtTwitter.configure(background="white", font="-family {Segoe UI} -size 15", foreground="black",
                                   highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black",
                                   selectbackground="blue", selectforeground="white", wrap="word")
 
         self.Label4 = tk.Label(top)
-        self.Label4.place(relx=0.597, rely=0.463, height=25, width=317)
+        self.Label4.place(relx=0.597, rely=0.463, height=47, width=741)
         self.Label4.configure(activebackground="#f9f9f9", activeforeground="black", background="#e3f8fb",
-                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
+                              disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Twitter''')
 
         self.txtSearch = tk.Entry(top)
         self.txtSearch.place(relx=0.012, rely=0.019, relheight=0.076, relwidth=0.403)
+        self.txtSearch.configure(font="-family {Segoe UI Black} -size 15 -weight bold")
 
         self.btnSearch = tk.Button(top)
         self.btnSearch.place(relx=0.426, rely=0.019, height=44, width=87)
         self.btnSearch.configure(activebackground="#fafeda", activeforeground="#000000", background="#f4ecbd",
-                                 disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
-                                 foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0",
+                                 disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
+                                 foreground="#000000", highlightbackground="#d9d9d9",
+                                 highlightcolor="black", pady="0",
                                  text='''Search''')
 
         self.btnQuit = tk.Button(top)
-        self.btnQuit.place(relx=0.914, rely=0.926, height=24, width=47)
+        self.btnQuit.place(relx=0.927, rely=0.934, height=44, width=117)
         self.btnQuit.configure(activebackground="#ececec", activeforeground="#000000", background="#f2bfcd",
-                               disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 10 -weight bold",
+                               disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                                foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0",
                                text='''Quit''')
 
@@ -199,9 +199,9 @@ class Toplevel1:
         showSearchHistory(self)
 
         self.sysLabel = tk.Label(top)
-        self.sysLabel.place(relx=0.012, rely=0.111, height=21, width=334)
+        self.sysLabel.place(relx=0.012, rely=0.111, height=40, width=781)
         self.sysLabel.configure(activebackground="#f9f9f9", activeforeground="black",anchor='w',background="#f4efe3",
-                                disabledforeground="#a3a3a3",font="-family {Segoe UI} -size 9 -slant italic",
+                                disabledforeground="#a3a3a3",font="-family {Segoe UI} -size 15 -slant italic",
                                 foreground="#eb3034",highlightbackground="#d9d9d9",highlightcolor="black",justify='left')
 
         self.cBoxGraph = ttk.Combobox(top, state='readonly') #PLACEHOLDER
@@ -209,7 +209,7 @@ class Toplevel1:
         self.cBoxGraph.configure(takefocus="")
 
         self.gphLabel = tk.Label(top)
-        self.gphLabel.place(relx=0.305, rely=0.926, height=21, width=353)
+        self.gphLabel.place(relx=0.305, rely=0.926, height=39, width=825)
         self.gphLabel.configure(anchor='w',background="#f4efe3",disabledforeground="#a3a3a3",foreground="#000000")
 
 
@@ -245,14 +245,22 @@ def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesA
     self.figure.clear()
     # self.figure.
     plt = self.figure.add_subplot(1, 1, 1)
-    x = dayArray
+    x = []
+    max_log_size = 5000
+    for i in dayArray:
+        i = ''.join(i.split())
+        i = i[:-5]
+        x.append(i)
+    print(x)
+
     # now there's 3 sets of points
     yCO = commentsArray
     yUV = upvotesArray
     yRT = retweetsArray
     yLK = likesArray
 
-    plt.set(yscale="log")
+    if max(yCO)>=max_log_size or max(yUV)>=max_log_size or max(yRT)>=max_log_size or max(yLK)>=max_log_size:
+        plt.set(yscale="log")
     plt.plot(x, yCO, label='Comments', marker='o', color='red')
     plt.plot(x, yUV, label='Upvotes', marker='o', color='#fa93b0')
     plt.plot(x, yRT, label='Retweets', marker='o', color='#2374f7')
