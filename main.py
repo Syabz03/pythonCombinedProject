@@ -224,6 +224,21 @@ de = dataExport()
 dayArray, commentArray, upvotesArray, retweetsArray, likesArray = [], [], [], [], []
 
 def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesArray):
+    """A function to call twitter crawler search function to return the list of Mydata objects
+
+            Args:
+                dayArray : arr
+                    the array containing the date ranges within the week of crawling
+                commentsArray : arr
+                    the array containing respective days' number of comments
+                upvotesArray : arr
+                    the array containing respective days' number of upvotes
+                retweetsArray : arr
+                    the array containing respective days' number of retweets
+                likesArray : arr
+                    the array containing respective days' number of likes
+
+    """
     self.canvas.get_tk_widget().place(relx=0.219, rely=0.519, relheight=0.389, relwidth=0.352)
 
     # Clears graph before plotting to prevent appending two graphs at once
@@ -247,6 +262,15 @@ def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesA
     self.figure.canvas.draw()
 
 def displayDay(self, redResult, twitResult):
+    """A function to display the posts and tweets based on the comboBox value date
+
+        Args:
+            redResult : List
+                the list of Mydata object which each contains reddit posts crawled for the respective days of the week
+            twitResult : List
+                the list of Mydata object which each contains twitter tweets crawled for the respective days of the week
+
+    """
     date = self.cBoxGraph.get()
     date_obj = datetime.strptime(date, '%d-%m-%Y')
     date_obj = date_obj.strftime("%Y-%m-%d")
@@ -286,6 +310,17 @@ def displayDay(self, redResult, twitResult):
     self.txtTwitter.configure(state='disabled')
 
 def show_entry_fields(self):
+    """A function to initialise elements in TKinter GUI and main functions for the program
+
+    Attributes:
+        redResult : list
+            to store list of Mydata objects of posts returned from crawler APIs
+        twitResult : list
+            to store list of Mydata objects of tweets returned from crawler APIs
+        err : str
+            to store exception error messages
+
+    """
     strInput = self.txtSearch.get()
     redResult = ''
     twitResult = ''
@@ -331,6 +366,17 @@ def show_entry_fields(self):
                 print('Exception at exporting data: ' + str(e))
 
 def twitterCrawl(self, strInput):
+    """A function to call twitter crawler search function to return the list of Mydata objects
+
+    Args:
+        strInput : str
+            the topic or input searched by the user.
+
+    Attributes:
+        strVal : str
+            obtain the field on the UI that contains all twitter tweets
+
+    """
     strVal = self.txtTwitter.get("1.0", 'end')
     if (strVal.strip()):
         self.txtTwitter.delete("1.0", 'end')
@@ -338,6 +384,19 @@ def twitterCrawl(self, strInput):
     return twitResult
 
 def displayTwitterTweets(self, twitResult):
+    """A function to display Twitter tweets and interaction counts on the TKinter elements
+
+    Args:
+        twitResult : List
+            the list of Mydata object which each contains twitter tweets crawled for the respective days of the week
+
+    Attributes:
+        twitterCCount : int
+            to keep count of number of tweets for all tweets displayed for the week
+        twitterICount : int
+            to keep count of number of likes for all tweets displayed for the week
+
+    """
     strVal = self.txtTwitter.get("1.0", 'end')
     if (strVal.strip()):
         self.txtTwitter.delete("1.0", 'end')
@@ -360,13 +419,42 @@ def displayTwitterTweets(self, twitResult):
     self.lblLikes.configure(text="Likes: " + str(twitterICount))
 
 def redditCrawl(self, strInput):
+    """A function to call reddit crawler search function to return the list of Mydata objects
+
+    Args:
+        strInput : str
+            the topic or input searched by the user.
+
+    Attributes:
+        str3Val : str
+            obtain the field on the UI that contains all reddit posts
+
+    """
     str3Val = self.txtReddit.get("1.0", 'end')
     if (str3Val.strip()):
         self.txtReddit.delete("1.0", 'end')
     redResult = red.search(strInput)
     return redResult
 
+
+
+
 def displayRedditPosts(self, redResult):
+    """A function to display Reddit posts and interaction counts on the TKinter elements
+
+    Args:
+        redResult : List
+            the list of Mydata object which each contains reddit posts crawled for the respective days of the week
+
+    Attributes:
+        redditCCount : int
+            to keep count of number of comments for all posts displayed
+        redditICount : int
+            to keep count of number of upvotes for all posts displayed
+        dayArray : arr
+            to keep track of the list of dates returned in redResult to be used for combobox values loading
+
+    """
     str3Val = self.txtReddit.get("1.0", 'end')
     if (str3Val.strip()):
         self.txtReddit.delete("1.0", 'end')
@@ -393,19 +481,18 @@ def displayRedditPosts(self, redResult):
     self.cBoxGraph.config(values=dayArray)
     self.gphLabel.configure(text="Displaying posts from " + str(min(dayArray)) + " to " + str(max(dayArray)))
 
-    return redResult
 
-"""A function to display previous user searches to UI 
-
-Attributes:
-    field : Tkinter's Text()
-        obtains the text in the field on the UI that contains all previous searches
-    hist : list
-        contains user's previous searches 
-    
-"""
 
 def showSearchHistory(self):
+    """A function to display previous user searches to UI
+
+    Attributes:
+        field : Tkinter's Text()
+            obtains the text in the field on the UI that contains all previous searches
+        hist : list
+            contains user's previous searches
+
+    """
     field = self.txtSearchHistory
     hist = de.getSearchHist()
 
@@ -417,23 +504,22 @@ def showSearchHistory(self):
             field.insert(tk.END, items + "\n")
     field.config(state='disabled')
 
-"""A function to add new user's search to file
-
-Args:
-    query : str
-        the topic or input searched by the user.
-
-Attributes:
-    items_temp : arr
-        temp array to store all previous and current searches before writing to file 
-    field : txtBox
-        obtain the field on the UI that contains all previous searches
-    index : int
-        to keep count of current for loop's iteration count 
-    
-"""
-
 def saveQuery(self, query):
+    """A function to add new user's search to file
+
+    Args:
+        query : str
+            the topic or input searched by the user.
+
+    Attributes:
+        items_temp : arr
+            temp array to store all previous and current searches before writing to file
+        field : txtBox
+            obtain the field on the UI that contains all previous searches
+        index : int
+            to keep count of current for loop's iteration count
+
+    """
     items_temp = []
     field = self.txtSearchHistory  # Initialise Search History textbox as 'field'
     field.config(state='normal')  # Enable 'field' for editing (removing and adding texts)
