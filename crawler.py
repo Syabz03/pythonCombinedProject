@@ -238,12 +238,6 @@ class twitterCrawler(crawler):
     """
     A class that inherits from the crawler class for crawling Twitter data
 
-    Attributes
-    ----------
-    topthree : object list
-        
-    stores the top three tweets of a day. One element in the list represents a day
-
     Methods
     -------
     search(input)
