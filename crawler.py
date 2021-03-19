@@ -236,7 +236,7 @@ class redditCrawler(crawler):
 
 class twitterCrawler(crawler):
     """
-    A class that inherits from the crawler class for crawling Twitter
+    A class that inherits from the crawler class for crawling Twitter data
 
     Attributes
     ----------
@@ -317,7 +317,7 @@ class twitterCrawler(crawler):
             day = datetime.now() - timedelta(days=n)
             results = self.api.search(q=f"{input} -filter:replies -filter:retweets", result_type="mixed", count=tweet_limit, until=day.strftime("%Y-%m-%d")) # Find tweets for that day
             
-            self.format(results, day) # Format the search result block of that day
+            self._format(results, day) # Format the search result block of that day
 
         # Print section for checking
         print("\n========================================Twitter Result===========================================\n")
@@ -338,7 +338,7 @@ class twitterCrawler(crawler):
            
         return self.data
 
-    def format(self, block, day):
+    def _format(self, block, day):
         """
         takes the results of a particular day and totals the like/retweet counts for that day, while also storing the top tweets
         
@@ -388,7 +388,7 @@ class twitterCrawler(crawler):
                 self.topids.append(tweet.id)
             elif tweet.favorite_count > lowest and tweet.id not in self.topids:
                 # When exceeding 3 top tweets, add new and remove tweet with lowest like count
-                lowest, toptweets = self.sortTop(tweet, toptweets)
+                lowest, toptweets = self._sortTop(tweet, toptweets)
 
         for tweet in toptweets:
 
@@ -398,7 +398,7 @@ class twitterCrawler(crawler):
 
         self.data.append(temp)
 
-    def sortTop(self, tweet, toptweets):
+    def _sortTop(self, tweet, toptweets):
         """
         sorts the top tweets and removes the tweet with the lowest like count
 
