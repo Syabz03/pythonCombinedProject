@@ -242,13 +242,13 @@ class twitterCrawler(crawler):
     ----------
     topthree : object list
         
-        stores the top three tweets of a day. One element in the list represents a day
+    stores the top three tweets of a day. One element in the list represents a day
 
     Methods
     -------
     search(input)
         
-        searches 50 tweets per day from the past week using the API for the topic given
+    searches 50 tweets per day from the past week using the API for the topic given
     """
 
     def __init__(self):
@@ -257,23 +257,23 @@ class twitterCrawler(crawler):
         ----------
         consumer_key : str
             
-            twitter account key for creating OAuth1a authentication with Twitter
+        twitter account key for creating OAuth1a authentication with Twitter
         
         consumer_secret : str
             
-            twitter account secret key for creating OAuth1a authentication with Twitter
+        twitter account secret key for creating OAuth1a authentication with Twitter
         
         access_token : str
             
-            twitter account access token for generating access token from Twitter
+        twitter account access token for generating access token from Twitter
         
         access_token_secret : str
             
-            twitter account secret token for generating access token from Twitter
+        twitter account secret token for generating access token from Twitter
         
         api : API object
             
-            stores API object for API methods
+        stores API object for API methods
         """
         consumer_key = "VpNVndPOykZXjQgfTg2RD21xz"
         consumer_secret = "1LyM7m5lTmNWwzUUSJF2kN04B5bZvRStY663PjNEnQRCS6b2QW"
@@ -290,26 +290,22 @@ class twitterCrawler(crawler):
 
     def search(self,input):
         """
-        searches 50 tweets per day from the past week using the API for the topic given
+        searches 50 tweets per day within the week using the API for the topic given
         
         Parameters
         ----------
         input : str
             
-            the topic to be searched
+        the topic to be searched
 
         Returns
         -------
         list
             
-            a list of size 7 mydata objects containing a list of posts, a total retweet count and a total like count
-
-        Notes
-        -----
-        the method works by searching a number of tweets of a certain day, however since the API cannot exactly search for a single day, it would add tweets of days up to a week before the specified day if it cannot find enough tweets, hence very popular tweets might come up multiple times
+        a list of size 7 mydata objects containing a list of 3 top posts, a total retweet count and a total like count
         """
-        self.data = []
-        self.topic = input
+        self.data = [] # The data to be returned
+        #self.topic = input
         self.topids = [] # Store every id of top tweets
 
         tweet_limit = 50 #Controls the number of tweets to search for a day
@@ -321,100 +317,100 @@ class twitterCrawler(crawler):
             day = datetime.now() - timedelta(days=n)
             results = self.api.search(q=f"{input} -filter:replies -filter:retweets", result_type="mixed", count=tweet_limit, until=day.strftime("%Y-%m-%d")) # Find tweets for that day
             
-            # Format the search result block of that day
-            self.format(results, day)
+            self.format(results, day) # Format the search result block of that day
 
         # Print section for checking
-        #print("\n========================================Twitter Result===========================================\n")
-        #
-        #for n in range(0, 7):
-        #
-        #    print(f"Day {n+1})\n")
-        #
-        #    for i in range(len(self.data[n].topComments)):
-        #    
-        #       print(self.data[n].topComments[i].text)
-        #       print(self.data[n].topComments[i].url)
-        #       print()
-        #
-        #    print("Total retweets: " + str(self.data[n].commentCount))
-        #    print("Total likes: " + str(self.data[n].interactionCount))
-        #    print()
+        print("\n========================================Twitter Result===========================================\n")
+        
+        for n in range(0, 7):
+        
+            print(f"Day {n+1})\n")
+        
+            for i in range(len(self.data[n].topComments)):
+            
+               print(self.data[n].topComments[i].text)
+               print(self.data[n].topComments[i].url)
+               print()
+        
+            print("Total retweets: " + str(self.data[n].commentCount))
+            print("Total likes: " + str(self.data[n].interactionCount))
+            print()
            
         return self.data
 
     def format(self, block, day):
         """
-        takes the results of a particular day and totals the like/retweet counts for that day, while also storing the tweets
+        takes the results of a particular day and totals the like/retweet counts for that day, while also storing the top tweets
         
         Parameters
         ----------
         block : SearchResults object
             
-            the block of tweets returned by twitter's API to be looked through
+        the block of tweets returned by twitter's API to be looked through
 
         day : datetime.date
 
-            the date used to search
-
-        Notes
-        -----
-        the important parameters are added into the data list, while the topthree list is for storing the top three tweets of the particular day
+        the date used to search the API
         """
-        # super().format(block)
+
+        daywidth = 2 # Width of days accepted into top tweets list
 
         # The day limit for search results
         # -8 hours to align with UTC timezone that twitter tweets use
         # Any tweets before this day should not be considered
-        # Basically narrowing the tweet results to be within 24 hours of the day used to search
-        beforelimit = (day - timedelta(days=2, hours=8)).replace(microsecond=0)
-        afterlimit = (day - timedelta(days=1, hours=8)).replace(microsecond=0)
+        # Basically narrowing the tweet results to be within 24*daywidth hours of the day used to search
+        beforelimit = (day - timedelta(days=daywidth+1, hours=8)).replace(microsecond=0) # Limit of earliest tweet
+        afterlimit = (day - timedelta(days=1, hours=8)).replace(microsecond=0)  # Limit of latest tweet
 
-        temp = Mydata(self.topic, 'Twitter', day)
-        #temppost = Mydata(self.topic, 'Twitter', day)
-        lowest = 0
+        temp = Mydata(self.topic, 'Twitter', day) # temporary mydata object to be appended to self.data after tallying everything
+        lowest = 0 # lowest like count of a tweet
         toptweets = []
 
-        #
-        #   GENERAL SECTION
-        #   For totalling like and comment count
-        #
-
-        # Go through tweets and combine the interaction data into 1 number for 1 day
+        # Go through tweets and combine the interaction data for 1 day
         for tweet in block:
-            #url = f"https://twitter.com/i/web/status/{tweet.id}"
-            #temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
-
-            if tweet is None:
-                return
+            
+            #Prevent searching if API did not get any search results
+            #if tweet.text is None:
+            #    print("No search results for Twitter")
+            #    return
 
             temp.addLikeCount(tweet.favorite_count)
             temp.addCommentCount(tweet.retweet_count)
 
             # Deny tweets that are not within the same day from entering top tweets
+            # DISABLED as the tweet count for a day is not be enough to populate top tweets list
             #if tweet.created_at > afterlimit or tweet.created_at < beforelimit:
             #    continue
 
             if len(toptweets) < 3 and tweet.id not in self.topids:
+                # Top tweets list has not been populated yet, just add
                 toptweets.append(tweet)
                 self.topids.append(tweet.id)
             elif tweet.favorite_count > lowest and tweet.id not in self.topids:
+                # When exceeding 3 top tweets, add new and remove tweet with lowest like count
                 lowest, toptweets = self.sortTop(tweet, toptweets)
 
         for tweet in toptweets:
 
-            #print(tweet.created_at)
-
+            # Add top three tweets to object to be returned
             url = f"https://twitter.com/i/web/status/{tweet.id}"
             temp.addPost(tweet.text, tweet.id, url, tweet.created_at)
-
-        #self.toptweets.append(temppost)
 
         self.data.append(temp)
 
     def sortTop(self, tweet, toptweets):
         """
-        sorts the top three tweets and removes the tweet with the lowest like count 
+        sorts the top tweets and removes the tweet with the lowest like count
+
+        Parameters
+        ----------
+        tweet : tweet object
+            
+        a single tweet from API search
+
+        toptweets : list
+
+        list of top tweets
         """
 
         toptweets.append(tweet) # Append the tweet into list of top 3 tweets
