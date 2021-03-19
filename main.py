@@ -65,7 +65,7 @@ class Toplevel1:
         _ana1color = '#d9d9d9'  # X11 color: 'gray85'
         _ana2color = '#ececec'  # Closest X11 color: 'gray92'
 
-        top.geometry("1920x1017")
+        top.attributes('-fullscreen', True)
         top.minsize(120, 1)
         top.maxsize(1924, 1061)
         top.resizable(1, 1)
@@ -85,17 +85,17 @@ class Toplevel1:
                               highlightbackground="#d9d9d9", highlightcolor="black", text='''Search History''')
 
         self.lblReddit = tk.Label(top)
-        self.lblReddit.place(relx=0.219, rely=0.222, height=51, width=665)
+        self.lblReddit.place(relx=0.219, rely=0.222, height=51, width=620)
         self.lblReddit.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
-                                 background="#ffa4a4",disabledforeground="#a3a3a3",
+                                 background="#F44336",disabledforeground="#a3a3a3",
                                  font="-family {Segoe UI Black} -size 15 -weight bold", foreground="#000000",
                                  highlightbackground="#d9d9d9",highlightcolor="black")
         self.lblReddit.configure(text='''Reddit''')
 
         self.lblTwitter = tk.Label(top)
-        self.lblTwitter.place(relx=0.219, rely=0.352, height=51, width=663)
+        self.lblTwitter.place(relx=0.219, rely=0.352, height=51, width=600)
         self.lblTwitter.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
-                                  background="#7ddeec",disabledforeground="#a3a3a3",
+                                  background="#2196F3",disabledforeground="#a3a3a3",
                                   font="-family {Segoe UI Black} -size 15 -weight bold",
                                   foreground="#000000",highlightbackground="#d9d9d9",
                                   highlightcolor="black")
@@ -153,7 +153,7 @@ class Toplevel1:
 
         self.Label3 = tk.Label(top)
         self.Label3.place(relx=0.597, rely=0.037, height=46, width=749)
-        self.Label3.configure(activebackground="#f9f9f9", activeforeground="black", background="#ffa4a4",
+        self.Label3.configure(activebackground="#f9f9f9", activeforeground="black", background="#F44336",
                               disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Reddit''')
@@ -161,12 +161,12 @@ class Toplevel1:
         self.txtTwitter = tk.Text(top, state='disabled')
         self.txtTwitter.place(relx=0.597, rely=0.519, relheight=0.389, relwidth=0.39)
         self.txtTwitter.configure(background="white", font="-family {Segoe UI} -size 15", foreground="black",
-                                  highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black",
+                                  highlightbackground="#2196F3", highlightcolor="black", insertbackground="black",
                                   selectbackground="blue", selectforeground="white", wrap="word")
 
         self.Label4 = tk.Label(top)
         self.Label4.place(relx=0.597, rely=0.463, height=47, width=741)
-        self.Label4.configure(activebackground="#f9f9f9", activeforeground="black", background="#e3f8fb",
+        self.Label4.configure(activebackground="#f9f9f9", activeforeground="black", background="#2196F3",
                               disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                               foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",
                               text='''Twitter''')
@@ -177,7 +177,7 @@ class Toplevel1:
 
         self.btnSearch = tk.Button(top)
         self.btnSearch.place(relx=0.426, rely=0.019, height=44, width=87)
-        self.btnSearch.configure(activebackground="#fafeda", activeforeground="#000000", background="#f4ecbd",
+        self.btnSearch.configure(activebackground="#fafeda", activeforeground="#000000", background="#1DE9B6",
                                  disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                                  foreground="#000000", highlightbackground="#d9d9d9",
                                  highlightcolor="black", pady="0",
@@ -185,7 +185,7 @@ class Toplevel1:
 
         self.btnQuit = tk.Button(top)
         self.btnQuit.place(relx=0.927, rely=0.934, height=44, width=117)
-        self.btnQuit.configure(activebackground="#ececec", activeforeground="#000000", background="#f2bfcd",
+        self.btnQuit.configure(activebackground="#ececec", activeforeground="#000000", background="#FF1744",
                                disabledforeground="#a3a3a3", font="-family {Segoe UI Black} -size 15 -weight bold",
                                foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0",
                                text='''Quit''')
