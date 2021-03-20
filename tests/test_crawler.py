@@ -21,22 +21,34 @@ class TestredditCrawler(unittest.TestCase):
 
 class TesttwitterCrawler(unittest.TestCase):
     
-    def test_search(self):
-        t = twitterCrawler()
-        result = t.search("covid")
+    def setUp(self):
+        self.t = twitterCrawler()
 
+    def testResultLength(self):
+        result = self.t.search("covid")
         self.assertEqual(len(result), 7)
+
+    def testLikeCount(self):
+        result = self.t.search("covid")
 
         likes = 0
         for day in result:
             likes += day.interactionCount
-
         self.assertGreater(likes,0)
 
-        result2 = t.search("fafoiguauga")
+    def testRetweetCount(self):
+        result = self.t.search("covid")
+
+        retweets = 0
+        for day in result:
+            retweets += day.commentCount
+        self.assertGreater(retweets,0)
+
+    def testNoResults(self):
+        result = self.t.search("uighsshhagegerg")
         tweets = 0
 
-        for day in result2:
+        for day in result:
             for tweet in day.topComments:
                 tweets += 1
 

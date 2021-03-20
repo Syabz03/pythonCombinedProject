@@ -83,13 +83,13 @@ class Mydata:
 
     def getTopComments(self):
         """returns the list of top tweets/posts
-        Returnss:
+        Returns:
             list: a list of 3 top tweets/posts
         """
         return self.topComments
 
 class Post:
-    """Represents 1 day of data from Reddit or Twitter 
+    """Represents 1 post/tweet
     Attributes:
         text(str): tweet/post content
         id(str): platform identifier for the post
@@ -117,3 +117,23 @@ class Post:
         self.url = url
         self.date = date
 
+    def getText(self):
+        """returns the post text
+        Returns:
+            string: the post text
+        """
+        return self.text
+
+    def getUrl(self):
+        """returns the post url
+        Returns:
+            string: the post url
+        """
+        return self.url
+
+    def getDate(self):
+        """returns the created date of post
+        Returns:
+            date: the created date of post
+        """
+        return self.date

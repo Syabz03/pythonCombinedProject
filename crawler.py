@@ -4,7 +4,6 @@ import prawcore
 from abc import ABC, abstractmethod
 from mydata import *
 from datetime import datetime, timedelta, date
-from urllib import error
 
 class crawler(ABC):
 
@@ -20,6 +19,7 @@ class crawler(ABC):
     topic = ''
     data = []
 
+    @abstractmethod
     def __init__(self):
         pass
 
@@ -87,7 +87,7 @@ class redditCrawler(crawler):
                 else:
                     # if subreddit name does not contains topic
                     self.subRedditPost.append(subr.search(self.topic, sort='top', time_filter='week', limit=100))
-            except:
+            except: #unable to catch the 403 error with the python urllib error
                 print("not allowed to view trafic")
 
         self._format()
@@ -121,8 +121,8 @@ class redditCrawler(crawler):
         try:
             self.subRedditPost = []
 
-            self.subRedditPost.append(self.reddit.subreddit("all").search(input,'top',limit=100,time_filter='week'))
-        except :
+            self.subRedditPost.append(self.reddit.subreddit("all").search(input,sort='top',limit=100,time_filter='week'))
+        except : #unable to catch the 403 error with the python urllib error
             print("not allowed to view trafic")
         self._format()
         return self.data
@@ -152,7 +152,7 @@ class redditCrawler(crawler):
                         day6.append(submission)
                     else:
                         day7.append(submission)
-            except:
+            except: #unable to catch the 403 error with the python urllib error
                 print("not allowed to view trafic")
         week.append(list(day1))  # oldest
         week.append(list(day2))
@@ -236,13 +236,7 @@ class redditCrawler(crawler):
 
 class twitterCrawler(crawler):
     """
-    A class that inherits from the crawler class for crawling Twitter
-
-    Attributes
-    ----------
-    topthree : object list
-        
-    stores the top three tweets of a day. One element in the list represents a day
+    A class that inherits from the crawler class for crawling Twitter data
 
     Methods
     -------
@@ -252,29 +246,6 @@ class twitterCrawler(crawler):
     """
 
     def __init__(self):
-        """
-        Parameters
-        ----------
-        consumer_key : str
-            
-        twitter account key for creating OAuth1a authentication with Twitter
-        
-        consumer_secret : str
-            
-        twitter account secret key for creating OAuth1a authentication with Twitter
-        
-        access_token : str
-            
-        twitter account access token for generating access token from Twitter
-        
-        access_token_secret : str
-            
-        twitter account secret token for generating access token from Twitter
-        
-        api : API object
-            
-        stores API object for API methods
-        """
         consumer_key = "VpNVndPOykZXjQgfTg2RD21xz"
         consumer_secret = "1LyM7m5lTmNWwzUUSJF2kN04B5bZvRStY663PjNEnQRCS6b2QW"
         access_token = "1358367734417903620-liyj12fLuUrQGM09nsqiVqiAsFKuRc"
@@ -317,7 +288,7 @@ class twitterCrawler(crawler):
             day = datetime.now() - timedelta(days=n)
             results = self.api.search(q=f"{input} -filter:replies -filter:retweets", result_type="mixed", count=tweet_limit, until=day.strftime("%Y-%m-%d")) # Find tweets for that day
             
-            self.format(results, day) # Format the search result block of that day
+            self._format(results, day) # Format the search result block of that day
 
         # Print section for checking
         print("\n========================================Twitter Result===========================================\n")
@@ -338,19 +309,9 @@ class twitterCrawler(crawler):
            
         return self.data
 
-    def format(self, block, day):
+    def _format(self, block, day):
         """
         takes the results of a particular day and totals the like/retweet counts for that day, while also storing the top tweets
-        
-        Parameters
-        ----------
-        block : SearchResults object
-            
-        the block of tweets returned by twitter's API to be looked through
-
-        day : datetime.date
-
-        the date used to search the API
         """
 
         daywidth = 2 # Width of days accepted into top tweets list
@@ -388,7 +349,7 @@ class twitterCrawler(crawler):
                 self.topids.append(tweet.id)
             elif tweet.favorite_count > lowest and tweet.id not in self.topids:
                 # When exceeding 3 top tweets, add new and remove tweet with lowest like count
-                lowest, toptweets = self.sortTop(tweet, toptweets)
+                lowest, toptweets = self._sortTop(tweet, toptweets)
 
         for tweet in toptweets:
 
@@ -398,19 +359,9 @@ class twitterCrawler(crawler):
 
         self.data.append(temp)
 
-    def sortTop(self, tweet, toptweets):
+    def _sortTop(self, tweet, toptweets):
         """
         sorts the top tweets and removes the tweet with the lowest like count
-
-        Parameters
-        ----------
-        tweet : tweet object
-            
-        a single tweet from API search
-
-        toptweets : list
-
-        list of top tweets
         """
 
         toptweets.append(tweet) # Append the tweet into list of top 3 tweets
