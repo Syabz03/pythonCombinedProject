@@ -355,14 +355,14 @@ def displayDay(self, redResult, twitResult):
                     self.txtReddit.insert(tk.END, "\nPost: \n" + post.getText())
                     self.txtReddit.insert(tk.END, "\n\nRead More: " + post.getUrl())
                     self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(datetime.fromtimestamp(post.getDate())))
-                    self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
+                    self.txtReddit.insert(tk.END, "\n---------------------------------------------------------------------------------------------")
         for myTwit in twitResult:
             for tweet in myTwit.getTopComments():
                 if date in str(tweet.getDate()):
                    self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.getText())
                    self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.getUrl())
                    self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str((tweet.getDate())))
-                   self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
+                   self.txtTwitter.insert(tk.END, "\n---------------------------------------------------------------------------------------------")
         if self.txtTwitter.compare("end-1c", "==", "1.0"):
             self.txtTwitter.insert(tk.END, "No tweets found on this day!")
         if self.txtReddit.compare("end-1c", "==", "1.0"):
@@ -420,13 +420,13 @@ def displayTwitterTweets(self, twitResult):
         likesArray.append(myTwitData.interactionCount)
         twitterCCount += myTwitData.commentCount  # RETWEETS
         twitterICount += myTwitData.interactionCount  # LIKES
-        self.txtTwitter.insert(tk.END, "\n===============================================")
+        self.txtTwitter.insert(tk.END, "\n=====================================================")
         for tweet in myTwitData.getTopComments():
             if 'twitter' in tweet.url.lower():
                 self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.getText())
                 self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.getUrl())
                 self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(tweet.getDate()))
-                self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
+                self.txtTwitter.insert(tk.END, "\n---------------------------------------------------------------------------------------------")
     self.lblRetweets.configure(text="Retweets: " + str(twitterCCount))
     self.lblLikes.configure(text="Likes: " + str(twitterICount))
 
@@ -476,13 +476,13 @@ def displayRedditPosts(self, redResult):
         redditCCount += myRedData.commentCount  # COMMENTS
         redditICount += myRedData.interactionCount  # UPVOTES
         dayArray.append(myRedData.date)
-        self.txtReddit.insert(tk.END, "\n===============================================")
+        self.txtReddit.insert(tk.END, "\n=====================================================")
         for post in myRedData.getTopComments():
             if myRedData.source == "reddit":
                 self.txtReddit.insert(tk.END, "\nPost: \n" + post.getText())
                 self.txtReddit.insert(tk.END, "\n\nRead More: " + post.getUrl())
                 self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(datetime.fromtimestamp(post.getDate())))
-                self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
+                self.txtReddit.insert(tk.END, "\n---------------------------------------------------------------------------------------------")
     self.lblComments.configure(text="Comments: " + str(redditCCount))
     self.lblUpvotes.configure(text="Upvotes: " + str(redditICount))
 
