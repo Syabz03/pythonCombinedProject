@@ -1,20 +1,78 @@
 import unittest
+import random
+import praw
+import copy
 from crawler import redditCrawler,twitterCrawler
 
 class Testcrawler(unittest.TestCase):
     pass
 
 class TestredditCrawler(unittest.TestCase):
+
+    def test_sortTop(self):
+        temp3 = []
+        reddit = praw.Reddit(
+            client_id='zo7beVRdF2cE8w',
+            client_secret='NQtiZSmriDzkW6hY-HaACbG86Nytpw',
+            user_agent='Java tests'
+        )
+        testobj = praw.models.Submission(reddit,id='kplck8')
+        i = redditCrawler()
+        for n in range(1,3):
+            testobj.score = random.randint(0, 100)
+            temp3.append(copy.deepcopy(testobj))
+        testobj.score = random.randint(0, 1000)
+
+        low, temp3 = i._sortTop(testobj,temp3)
+
+        #test the corrent low value return
+        self.assertEqual(low, temp3[0].score)
+        
+        #test the posts are sorted in order
+        self.assertGreater(temp3[1].score,temp3[0].score)
+        self.assertGreater(temp3[2].score,temp3[1].score)
+
     def test_search(self):
         i = redditCrawler()
-        dat = i.search('feng shui')
-
+        dat = i.search('anime')
+        #check that the 7 my dataobjs are returned
         self.assertEqual(len(dat),7)
+        
+        #test interaction count
         count = 0
         for day in dat:
             count += day.interactionCount
 
         self.assertGreater(count,0)
+
+        #test comment count
+        comment = 0
+        for day in dat:
+            comment += day.commentCount
+
+        self.assertGreater(comment,0)
+
+    def test_generalSearch(self):
+        i = redditCrawler()
+        dat = i.generalSearch('feng shui')
+        #check that the 7 my dataobjs are returned
+        self.assertEqual(len(dat),7)
+        
+        #test interaction count
+        count = 0
+        for day in dat:
+            count += day.interactionCount
+
+        self.assertGreater(count,0)
+
+        #test comment count
+        comment = 0
+        for day in dat:
+            comment += day.commentCount
+
+        self.assertGreater(comment,0)
+        
+        
 
     #unable to test format due to how it links to search
     #self.fail() #use when case fails
