@@ -84,7 +84,7 @@ class Toplevel1:
                               highlightbackground="#d9d9d9", highlightcolor="black", text='''Search History''')
 
         self.lblReddit = tk.Label(top)
-        self.lblReddit.place(relx=0.219, rely=0.222, height=51, width=620)
+        self.lblReddit.place(relx=0.219, rely=0.222, height=51, width=665)
         self.lblReddit.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
                                  background="#F44336",disabledforeground="#a3a3a3",
                                  font="-family {Segoe UI Black} -size 15 -weight bold", foreground="#000000",
@@ -92,7 +92,7 @@ class Toplevel1:
         self.lblReddit.configure(text='''Reddit''')
 
         self.lblTwitter = tk.Label(top)
-        self.lblTwitter.place(relx=0.219, rely=0.352, height=51, width=600)
+        self.lblTwitter.place(relx=0.219, rely=0.352, height=51, width=665)
         self.lblTwitter.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
                                   background="#2196F3",disabledforeground="#a3a3a3",
                                   font="-family {Segoe UI Black} -size 15 -weight bold",
@@ -106,7 +106,7 @@ class Toplevel1:
         self.lblComments.configure(text='''Comments: -''')
 
         self.lblRetweets = tk.Label(top)
-        self.lblRetweets.place(relx=0.219, rely=0.389, height=39, width=663)
+        self.lblRetweets.place(relx=0.219, rely=0.389, height=39, width=665)
         self.lblRetweets.configure(activebackground="#f9f9f9",activeforeground="black",anchor='nw',background="#b9edf4",
                                    disabledforeground="#a3a3a3",foreground="#000000",font="-family {Segoe UI} -size 15",
                                    highlightbackground="#d9d9d9",highlightcolor="black")
@@ -121,7 +121,7 @@ class Toplevel1:
         self.lblUpvotes.configure(text='''Upvotes: -''')
 
         self.lblLikes = tk.Label(top)
-        self.lblLikes.place(relx=0.219, rely=0.426, height=40, width=663)
+        self.lblLikes.place(relx=0.219, rely=0.426, height=40, width=665)
         self.lblLikes.configure(activebackground="#f9f9f9",activeforeground="black",
                                 anchor='nw',background="#b9edf4",disabledforeground="#a3a3a3",font="-family {Segoe UI} -size 15",
                                 foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black")
@@ -264,8 +264,6 @@ def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesA
 
     plt.legend()
     self.figure.canvas.draw()
-
-
 
 def show_entry_fields(self):
     """A function to initialise elements in TKinter GUI and main functions for the program
