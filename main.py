@@ -1,10 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-import tweepy
-import praw
-# from mydata import *
-from crawler import *
-from JSONExport import *
+from crawler import redditCrawler,twitterCrawler
+from JSONExport import dataExport
 import sys
 import myPage_support
 import matplotlib.pyplot as plt
@@ -215,9 +212,6 @@ class Toplevel1:
         self.gphLabel.configure(anchor='w',background="#f4efe3",disabledforeground="#a3a3a3",foreground="#000000")
 
 
-# Reddit
-reddit = praw.Reddit(client_id='PESO3cS0KquaWQ', client_secret='ALSLenkZwZ5WCZ-32MaziUw-O7tmeA',
-                     user_agent='VanillaCast')
 
 red = redditCrawler()
 twit = twitterCrawler()

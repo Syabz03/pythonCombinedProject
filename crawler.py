@@ -118,6 +118,7 @@ class redditCrawler(crawler):
             i.e. "GPU" might come up in a escape from tarkov post cause of an in game item
             i.e. no posts found, reddit returns random results
         """
+        super().search(input)
         try:
             self.subRedditPost = []
 
