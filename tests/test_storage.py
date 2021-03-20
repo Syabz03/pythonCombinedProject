@@ -1,6 +1,8 @@
-import unittest
 import json
-from storage import *
+import unittest
+
+from storage import storage
+
 
 class testStorage(unittest.TestCase):
     """A class to test that reading and writing of data to JSON files works as intended
@@ -49,7 +51,7 @@ class testStorage(unittest.TestCase):
                             }
                         ]
                     }
-        file_name = 'tests/data/Hello_data.json'
+        file_name = 'tests/Hello_data.json'
         de.write_json(sample_json, file_name)
         json_data = de.read_json(file_name)
 
@@ -72,7 +74,7 @@ class testStorage(unittest.TestCase):
         """
 
         de = storage()
-        file_name = 'tests/data/Hello_data.json'
+        file_name = 'tests/Hello_data.json'
         json_data = de.read_json(file_name)
         tcLength = len(json_data['topComments'])
 
@@ -98,7 +100,7 @@ class testStorage(unittest.TestCase):
         """
 
         de = storage()
-        file_name = 'tests/data/Hello_data.json'
+        file_name = 'tests/Hello_data.json'
         json_data = de.read_json(file_name)
         source = json_data['source'] + '.com'
         url = json_data['topComments'][0]['url']

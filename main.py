@@ -1,7 +1,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from crawler import redditCrawler,twitterCrawler
-from JSONExport import dataExport
+from storage import storage
 import sys
 import myPage_support
 import matplotlib.pyplot as plt
@@ -215,7 +215,7 @@ class Toplevel1:
 
 red = redditCrawler()
 twit = twitterCrawler()
-de = dataExport()
+de = storage()
 
 dayArray, commentsArray, upvotesArray, retweetsArray, likesArray = [], [], [], [], []
 
