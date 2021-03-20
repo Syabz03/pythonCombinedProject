@@ -2,6 +2,7 @@ import unittest
 import random
 import praw
 import copy
+import mydata
 from crawler import redditCrawler,twitterCrawler
 
 class Testcrawler(unittest.TestCase):
@@ -16,14 +17,16 @@ class TestredditCrawler(unittest.TestCase):
             client_secret='NQtiZSmriDzkW6hY-HaACbG86Nytpw',
             user_agent='Java tests'
         )
-        testobj = praw.models.Submission(reddit,id='kplck8')
+        testobj1 = praw.models.Submission(reddit,id='kplck8')
+        testobj2 = praw.models.Submission(reddit,id='m95lzk')
+        testobj3 = praw.models.Submission(reddit,id='m94j1u')
+        testobj4 = praw.models.Submission(reddit,id='iuxslh')
+        temp3.append(testobj1)
+        temp3.append(testobj2)
+        temp3.append(testobj3)
         i = redditCrawler()
-        for n in range(1,3):
-            testobj.score = random.randint(0, 100)
-            temp3.append(copy.deepcopy(testobj))
-        testobj.score = random.randint(0, 1000)
 
-        low, temp3 = i._sortTop(testobj,temp3)
+        low, temp3 = i._sortTop(testobj4,temp3)
 
         #test the corrent low value return
         self.assertEqual(low, temp3[0].score)
@@ -32,85 +35,87 @@ class TestredditCrawler(unittest.TestCase):
         self.assertGreater(temp3[1].score,temp3[0].score)
         self.assertGreater(temp3[2].score,temp3[1].score)
 
-    def test_search(self):
-        i = redditCrawler()
-        dat = i.search('anime')
-        #check that the 7 my dataobjs are returned
-        self.assertEqual(len(dat),7)
+#     def test_search(self):
+#         i = redditCrawler()
+#         dat = i.search('anime')
+#         #check that the 7 my dataobjs are returned
+#         self.assertEqual(len(dat),7)
         
-        #test interaction count
-        count = 0
-        for day in dat:
-            count += day.interactionCount
+#         #test interaction count
+#         count = 0
+#         for day in dat:
+#             count += day.interactionCount
 
-        self.assertGreater(count,0)
+#         self.assertGreater(count,0)
 
-        #test comment count
-        comment = 0
-        for day in dat:
-            comment += day.commentCount
+#         #test comment count
+#         comment = 0
+#         for day in dat:
+#             comment += day.commentCount
 
-        self.assertGreater(comment,0)
+#         self.assertIsInstance(day,mydata.Mydata)
+#         self.assertGreater(comment,0)
 
-    def test_generalSearch(self):
-        i = redditCrawler()
-        dat = i.generalSearch('feng shui')
-        #check that the 7 my dataobjs are returned
-        self.assertEqual(len(dat),7)
+#     def test_generalSearch(self):
+#         i = redditCrawler()
+#         dat = i.generalSearch('feng shui')
+#         #check that the 7 my dataobjs are returned
+#         self.assertEqual(len(dat),7)
         
-        #test interaction count
-        count = 0
-        for day in dat:
-            count += day.interactionCount
+#         #test interaction count
+#         count = 0
+#         for day in dat:
+#             count += day.interactionCount
 
-        self.assertGreater(count,0)
+#         self.assertGreater(count,0)
 
-        #test comment count
-        comment = 0
-        for day in dat:
-            comment += day.commentCount
+#         #test comment count
+#         comment = 0
+#         for day in dat:
+#             comment += day.commentCount
 
-        self.assertGreater(comment,0)
+#         self.assertIsInstance(day,mydata.Mydata)
+#         self.assertGreater(comment,0)
         
         
 
-    #unable to test format due to how it links to search
-    #self.fail() #use when case fails
+#     #unable to test format due to how it links to search
+#     #self.fail() #use when case fails
 
-class TesttwitterCrawler(unittest.TestCase):
+# class TesttwitterCrawler(unittest.TestCase):
     
-    def setUp(self):
-        self.t = twitterCrawler()
+#     def setUp(self):
+#         self.t = twitterCrawler()
 
-    def testResultLength(self):
-        result = self.t.search("covid")
-        self.assertEqual(len(result), 7)
+#     def testResultLength(self):
+#         result = self.t.search("covid")
+#         self.assertEqual(len(result), 7)
 
-    def testLikeCount(self):
-        result = self.t.search("covid")
+#     def testLikeCount(self):
+#         result = self.t.search("covid")
 
-        likes = 0
-        for day in result:
-            likes += day.interactionCount
-        self.assertGreater(likes,0)
+#         likes = 0
+#         for day in result:
+#             likes += day.interactionCount
+#         self.assertGreater(likes,0)
 
-    def testRetweetCount(self):
-        result = self.t.search("covid")
+#     def testRetweetCount(self):
+#         result = self.t.search("covid")
 
-        retweets = 0
-        for day in result:
-            retweets += day.commentCount
-        self.assertGreater(retweets,0)
+#         retweets = 0
+#         for day in result:
+#             retweets += day.commentCount
+#         self.assertGreater(retweets,0)
 
-    def testNoResults(self):
-        result = self.t.search("uighsshhagegerg")
-        tweets = 0
+#     def testNoResults(self):
+#         result = self.t.search("uighsshhagegerg")
+#         tweets = 0
 
-        for day in result:
-            for tweet in day.topComments:
-                tweets += 1
+#         for day in result:
+#             for tweet in day.topComments:
+#                 tweets += 1
 
-        self.assertEqual(tweets, 0)
+#         self.assertEqual(tweets, 0)
 
 
 if __name__ == '__main__':
