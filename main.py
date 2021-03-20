@@ -84,7 +84,7 @@ class Toplevel1:
                               highlightbackground="#d9d9d9", highlightcolor="black", text='''Search History''')
 
         self.lblReddit = tk.Label(top)
-        self.lblReddit.place(relx=0.219, rely=0.222, height=51, width=620)
+        self.lblReddit.place(relx=0.219, rely=0.222, height=51, width=665)
         self.lblReddit.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
                                  background="#F44336",disabledforeground="#a3a3a3",
                                  font="-family {Segoe UI Black} -size 15 -weight bold", foreground="#000000",
@@ -92,7 +92,7 @@ class Toplevel1:
         self.lblReddit.configure(text='''Reddit''')
 
         self.lblTwitter = tk.Label(top)
-        self.lblTwitter.place(relx=0.219, rely=0.352, height=51, width=600)
+        self.lblTwitter.place(relx=0.219, rely=0.352, height=51, width=665)
         self.lblTwitter.configure(activebackground="#f9f9f9",activeforeground="black",anchor='n',
                                   background="#2196F3",disabledforeground="#a3a3a3",
                                   font="-family {Segoe UI Black} -size 15 -weight bold",
@@ -106,7 +106,7 @@ class Toplevel1:
         self.lblComments.configure(text='''Comments: -''')
 
         self.lblRetweets = tk.Label(top)
-        self.lblRetweets.place(relx=0.219, rely=0.389, height=39, width=663)
+        self.lblRetweets.place(relx=0.219, rely=0.389, height=39, width=665)
         self.lblRetweets.configure(activebackground="#f9f9f9",activeforeground="black",anchor='nw',background="#b9edf4",
                                    disabledforeground="#a3a3a3",foreground="#000000",font="-family {Segoe UI} -size 15",
                                    highlightbackground="#d9d9d9",highlightcolor="black")
@@ -121,7 +121,7 @@ class Toplevel1:
         self.lblUpvotes.configure(text='''Upvotes: -''')
 
         self.lblLikes = tk.Label(top)
-        self.lblLikes.place(relx=0.219, rely=0.426, height=40, width=663)
+        self.lblLikes.place(relx=0.219, rely=0.426, height=40, width=665)
         self.lblLikes.configure(activebackground="#f9f9f9",activeforeground="black",
                                 anchor='nw',background="#b9edf4",disabledforeground="#a3a3a3",font="-family {Segoe UI} -size 15",
                                 foreground="#000000",highlightbackground="#d9d9d9",highlightcolor="black")
@@ -265,8 +265,6 @@ def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesA
     plt.legend()
     self.figure.canvas.draw()
 
-
-
 def show_entry_fields(self):
     """A function to initialise elements in TKinter GUI and main functions for the program
 
@@ -357,14 +355,14 @@ def displayDay(self, redResult, twitResult):
                     self.txtReddit.insert(tk.END, "\nPost: \n" + post.getText())
                     self.txtReddit.insert(tk.END, "\n\nRead More: " + post.getUrl())
                     self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(datetime.fromtimestamp(post.getDate())))
-                    self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
+                    self.txtReddit.insert(tk.END, "\n---------------------------------------------------------------------------------------------")
         for myTwit in twitResult:
             for tweet in myTwit.getTopComments():
                 if date in str(tweet.getDate()):
                    self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.getText())
                    self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.getUrl())
                    self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str((tweet.getDate())))
-                   self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
+                   self.txtTwitter.insert(tk.END, "\n---------------------------------------------------------------------------------------------")
         if self.txtTwitter.compare("end-1c", "==", "1.0"):
             self.txtTwitter.insert(tk.END, "No tweets found on this day!")
         if self.txtReddit.compare("end-1c", "==", "1.0"):
@@ -422,13 +420,13 @@ def displayTwitterTweets(self, twitResult):
         likesArray.append(myTwitData.interactionCount)
         twitterCCount += myTwitData.commentCount  # RETWEETS
         twitterICount += myTwitData.interactionCount  # LIKES
-        self.txtTwitter.insert(tk.END, "\n===============================================")
+        self.txtTwitter.insert(tk.END, "\n=====================================================")
         for tweet in myTwitData.getTopComments():
             if 'twitter' in tweet.url.lower():
                 self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.getText())
                 self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.getUrl())
                 self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(tweet.getDate()))
-                self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
+                self.txtTwitter.insert(tk.END, "\n---------------------------------------------------------------------------------------------")
     self.lblRetweets.configure(text="Retweets: " + str(twitterCCount))
     self.lblLikes.configure(text="Likes: " + str(twitterICount))
 
@@ -478,13 +476,13 @@ def displayRedditPosts(self, redResult):
         redditCCount += myRedData.commentCount  # COMMENTS
         redditICount += myRedData.interactionCount  # UPVOTES
         dayArray.append(myRedData.date)
-        self.txtReddit.insert(tk.END, "\n===============================================")
+        self.txtReddit.insert(tk.END, "\n=====================================================")
         for post in myRedData.getTopComments():
             if myRedData.source == "reddit":
                 self.txtReddit.insert(tk.END, "\nPost: \n" + post.getText())
                 self.txtReddit.insert(tk.END, "\n\nRead More: " + post.getUrl())
                 self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(datetime.fromtimestamp(post.getDate())))
-                self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
+                self.txtReddit.insert(tk.END, "\n---------------------------------------------------------------------------------------------")
     self.lblComments.configure(text="Comments: " + str(redditCCount))
     self.lblUpvotes.configure(text="Upvotes: " + str(redditICount))
 
