@@ -209,7 +209,7 @@ class Toplevel1:
 
         self.gphLabel = tk.Label(top)
         self.gphLabel.place(relx=0.305, rely=0.926, height=39, width=825)
-        self.gphLabel.configure(anchor='w',background="#f4efe3",disabledforeground="#a3a3a3",foreground="#000000")
+        self.gphLabel.configure(anchor='w',background="#f4efe3",disabledforeground="#a3a3a3",foreground="#000000", font="-family {Segoe UI Black} -size 15 -weight bold")
 
 
 
