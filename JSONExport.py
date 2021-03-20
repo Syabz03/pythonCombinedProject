@@ -2,6 +2,7 @@ import json
 import dateparser as dp
 from pathlib import Path
 from datetime import date
+import copy
 
 class dataExport():
     """A class to be called by main.py for exporting of crawled data to a json file
@@ -148,6 +149,8 @@ class dataExport():
         
         """
 
+        dataTemp = copy.deepcopy(data)
+
         data_temp = []
         posts_temp = []
         dates_temp = [] # store data's dates for comparison to insert new entry or not
@@ -157,7 +160,7 @@ class dataExport():
         today = date.today()
         curr_date = today.strftime("%Y-%m-%d")
 
-        source = str(data[0].source) # get the source (either reddit or twitter)
+        source = str(dataTemp[0].source) # get the source (either reddit or twitter)
         # print(topic, source) # print for verification
         data_file = self.path + topic + "_" + source + "_data.json" 
         posts_file = self.path + topic + "_" + source + "_posts.json"
@@ -183,7 +186,7 @@ class dataExport():
 
         id_set = set(ids_temp)
         date_set = set(dates_temp)
-        for submission in data:
+        for submission in dataTemp:
             to_dict = vars(submission)
             to_dict['date'] = str(dp.parse(str(to_dict['date']))).split()[0]
 

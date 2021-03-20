@@ -14,6 +14,7 @@ from matplotlib.backends.backend_tkagg import (
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 from datetime import datetime, timedelta
+import copy
 
 queryLimit = 5
 
@@ -222,10 +223,10 @@ red = redditCrawler()
 twit = twitterCrawler()
 de = dataExport()
 
-dayArray, commentArray, upvotesArray, retweetsArray, likesArray = [], [], [], [], []
+dayArray, commentsArray, upvotesArray, retweetsArray, likesArray = [], [], [], [], []
 
 def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesArray):
-    """A function to call twitter crawler search function to return the list of Mydata objects
+    """A function to plot graph using module matplotlib based on the 5 array parameters and its value to display the topic's interaction count for the week
 
             Args:
                 dayArray : arr
@@ -270,8 +271,72 @@ def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesA
     plt.legend()
     self.figure.canvas.draw()
 
+
+
+def show_entry_fields(self):
+    """A function to initialise elements in TKinter GUI and main functions for the program
+
+    Attributes:
+        redResult : list
+            to store list of Mydata objects of posts returned from crawler APIs
+        twitResult : list
+            to store list of Mydata objects of tweets returned from crawler APIs
+        err : str
+            to store exception error messages
+
+    """
+    strInput = self.txtSearch.get()
+    redResult = ''
+    twitResult = ''
+
+
+    if len(dayArray)!=0 or len(commentsArray)!=0 or len(upvotesArray)!=0 or len(retweetsArray)!=0 or len(likesArray)!=0:
+        dayArray.clear()
+        commentsArray.clear()
+        upvotesArray.clear()
+        retweetsArray.clear()
+        likesArray.clear()
+
+    if len(strInput) == 0 or len(strInput.strip()) == 0:
+        self.sysLabel.configure(text='Field is empty! Please enter a search term.')
+    else:
+        self.sysLabel.configure(text='')
+        self.lblComments.configure(text='')
+        self.lblUpvotes.configure(text='')
+        self.lblRetweets.configure(text='')
+        self.lblLikes.configure(text='')
+        err = ''
+        try:
+            self.txtReddit.configure(state='normal')
+            self.txtTwitter.configure(state='normal')
+            redResult = redditCrawl(self, strInput)
+            displayRedditPosts(self, redResult)
+            twitResult = twitterCrawl(self, strInput)
+            displayTwitterTweets(self, twitResult)
+            print("=====Main====")
+            for post in redResult:
+                for i in post.getTopComments():
+                    print(i)
+
+            self.cBoxGraph.bind("<<ComboboxSelected>>", lambda _: displayDay(self, redResult, twitResult))
+            plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesArray)
+            self.txtReddit.configure(state='disabled')
+            self.txtTwitter.configure(state='disabled')
+            saveQuery(self, strInput)
+        except Exception as e:
+            err = e
+            print('Exception at show_entry_fields: ' + str(e))
+
+        if (err == ''):
+            try:
+                de.exportData(redResult, strInput)
+                de.exportData(twitResult, strInput)
+                pass
+            except Exception as e:
+                print('Exception at exporting data: ' + str(e))
+
 def displayDay(self, redResult, twitResult):
-    """A function to display the posts and tweets based on the comboBox value date
+    """A function to display the posts and tweets based on date
 
         Args:
             redResult : List
@@ -294,21 +359,18 @@ def displayDay(self, redResult, twitResult):
         #Display the day's posts and tweets
         for myRedData in redResult:
             for post in myRedData.getTopComments():
-                if date in str(post['date']):
-                    print(post['text'])
-                    self.txtReddit.insert(tk.END, "\nPost: \n" + post['text'])
-                    self.txtReddit.insert(tk.END, "\n\nRead More: " + post['url'])
-                    self.txtReddit.insert(tk.END, "\n\nPosted On: " + str((post['date'])))
+                if date in str(datetime.fromtimestamp(post.getDate())):
+                    self.txtReddit.insert(tk.END, "\nPost: \n" + post.getText())
+                    self.txtReddit.insert(tk.END, "\n\nRead More: " + post.getUrl())
+                    self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(datetime.fromtimestamp(post.getDate())))
                     self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
         for myTwit in twitResult:
             for tweet in myTwit.getTopComments():
-                if date in str(tweet['date']):
-                    print(tweet['text'])
-                    self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet['text'])
-                    self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet['url'])
-                    self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str((tweet['date'])))
-                    self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
-
+                if date in str(tweet.getDate()):
+                   self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.getText())
+                   self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.getUrl())
+                   self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str((tweet.getDate())))
+                   self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
         if self.txtTwitter.compare("end-1c", "==", "1.0"):
             self.txtTwitter.insert(tk.END, "No tweets found on this day!")
         if self.txtReddit.compare("end-1c", "==", "1.0"):
@@ -317,62 +379,6 @@ def displayDay(self, redResult, twitResult):
     self.gphLabel.configure(text="Displaying results from " + str(date))
     self.txtReddit.configure(state='disabled')
     self.txtTwitter.configure(state='disabled')
-
-def show_entry_fields(self):
-    """A function to initialise elements in TKinter GUI and main functions for the program
-
-    Attributes:
-        redResult : list
-            to store list of Mydata objects of posts returned from crawler APIs
-        twitResult : list
-            to store list of Mydata objects of tweets returned from crawler APIs
-        err : str
-            to store exception error messages
-
-    """
-    strInput = self.txtSearch.get()
-    redResult = ''
-    twitResult = ''
-
-    self.cBoxGraph.bind("<<ComboboxSelected>>", lambda _: displayDay(self, redResult, twitResult))
-
-    if len(dayArray)!=0 or len(commentArray)!=0 or len(upvotesArray)!=0 or len(retweetsArray)!=0 or len(likesArray)!=0:
-        dayArray.clear()
-        commentArray.clear()
-        upvotesArray.clear()
-        retweetsArray.clear()
-        likesArray.clear()
-
-    if len(strInput) == 0 or len(strInput.strip()) == 0:
-        self.sysLabel.configure(text='Field is empty! Please enter a search term.')
-    else:
-        self.sysLabel.configure(text='')
-        self.lblComments.configure(text='')
-        self.lblUpvotes.configure(text='')
-        self.lblRetweets.configure(text='')
-        self.lblLikes.configure(text='')
-        err = ''
-        try:
-            self.txtReddit.configure(state='normal')
-            self.txtTwitter.configure(state='normal')
-            redResult = redditCrawl(self, strInput)
-            displayRedditPosts(self, redResult)
-            twitResult = twitterCrawl(self, strInput)
-            displayTwitterTweets(self, twitResult)
-            plotGraph(self, dayArray, commentArray, upvotesArray, retweetsArray, likesArray)
-            self.txtReddit.configure(state='disabled')
-            self.txtTwitter.configure(state='disabled')
-            saveQuery(self, strInput)
-        except Exception as e:
-            err = e
-            print('Exception at show_entry_fields: ' + str(e))
-
-        if (err == ''):
-            try:
-                de.exportData(redResult, strInput)
-                de.exportData(twitResult, strInput)
-            except Exception as e:
-                print('Exception at exporting data: ' + str(e))
 
 def twitterCrawl(self, strInput):
     """A function to call twitter crawler search function to return the list of Mydata objects
@@ -390,6 +396,11 @@ def twitterCrawl(self, strInput):
     if (strVal.strip()):
         self.txtTwitter.delete("1.0", 'end')
     twitResult = twit.search(strInput)
+    print("====Twitter====")
+    for post in twitResult:
+        for i in post.getTopComments():
+            print(i)
+
     return twitResult
 
 def displayTwitterTweets(self, twitResult):
@@ -420,9 +431,9 @@ def displayTwitterTweets(self, twitResult):
         self.txtTwitter.insert(tk.END, "\n===============================================")
         for tweet in myTwitData.getTopComments():
             if 'twitter' in tweet.url.lower():
-                self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.text)
-                self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.url)
-                self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(tweet.date))
+                self.txtTwitter.insert(tk.END, "\nTweet: \n" + tweet.getText())
+                self.txtTwitter.insert(tk.END, "\n\nRead More: " + tweet.getUrl())
+                self.txtTwitter.insert(tk.END, "\n\nPosted On: " + str(tweet.getDate()))
                 self.txtTwitter.insert(tk.END, "\n--------------------------------------------------")
     self.lblRetweets.configure(text="Retweets: " + str(twitterCCount))
     self.lblLikes.configure(text="Likes: " + str(twitterICount))
@@ -468,7 +479,7 @@ def displayRedditPosts(self, redResult):
     redditICount = 0
 
     for myRedData in redResult:
-        commentArray.append(myRedData.commentCount)
+        commentsArray.append(myRedData.commentCount)
         upvotesArray.append(myRedData.interactionCount)
         redditCCount += myRedData.commentCount  # COMMENTS
         redditICount += myRedData.interactionCount  # UPVOTES
@@ -476,9 +487,9 @@ def displayRedditPosts(self, redResult):
         self.txtReddit.insert(tk.END, "\n===============================================")
         for post in myRedData.getTopComments():
             if myRedData.source == "reddit":
-                self.txtReddit.insert(tk.END, "\nPost: \n" + post.text)
-                self.txtReddit.insert(tk.END, "\n\nRead More: " + post.url)
-                self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(datetime.fromtimestamp(post.date)))
+                self.txtReddit.insert(tk.END, "\nPost: \n" + post.getText())
+                self.txtReddit.insert(tk.END, "\n\nRead More: " + post.getUrl())
+                self.txtReddit.insert(tk.END, "\n\nPosted On: " + str(datetime.fromtimestamp(post.getDate())))
                 self.txtReddit.insert(tk.END, "\n--------------------------------------------------")
     self.lblComments.configure(text="Comments: " + str(redditCCount))
     self.lblUpvotes.configure(text="Upvotes: " + str(redditICount))
