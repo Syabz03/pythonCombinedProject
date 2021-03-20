@@ -1,14 +1,16 @@
-import unittest
 import json
-from JSONExport import *
+import unittest
 
-class testExport(unittest.TestCase):
+from storage import storage
+
+
+class testStorage(unittest.TestCase):
     """A class to test that reading and writing of data to JSON files works as intended
 
     """
 
     def test_read_write(self):
-        """A function to test writing and reading of sample data using functions in JSONExport.py 
+        """A function to test writing and reading of sample data using functions in storage.py 
 
         Attributes:
             de : str
@@ -21,7 +23,7 @@ class testExport(unittest.TestCase):
                 json data from file name in variable 'file_name' read by function 'read_json'
         
         """
-        de = dataExport()
+        de = storage()
         sample_json = {
                         "topic": "Hello",
                         "source": "reddit",
@@ -49,7 +51,7 @@ class testExport(unittest.TestCase):
                             }
                         ]
                     }
-        file_name = 'tests/data/Hello_data.json'
+        file_name = 'tests/Hello_data.json'
         de.write_json(sample_json, file_name)
         json_data = de.read_json(file_name)
 
@@ -71,8 +73,8 @@ class testExport(unittest.TestCase):
 
         """
 
-        de = dataExport()
-        file_name = 'tests/data/Hello_data.json'
+        de = storage()
+        file_name = 'tests/Hello_data.json'
         json_data = de.read_json(file_name)
         tcLength = len(json_data['topComments'])
 
@@ -97,8 +99,8 @@ class testExport(unittest.TestCase):
 
         """
 
-        de = dataExport()
-        file_name = 'tests/data/Hello_data.json'
+        de = storage()
+        file_name = 'tests/Hello_data.json'
         json_data = de.read_json(file_name)
         source = json_data['source'] + '.com'
         url = json_data['topComments'][0]['url']

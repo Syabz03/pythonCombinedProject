@@ -4,7 +4,7 @@ from pathlib import Path
 from datetime import date
 import copy
 
-class dataExport():
+class storage():
     """A class to be called by main.py for exporting of crawled data to a json file
 
     Attributes:
@@ -70,7 +70,7 @@ class dataExport():
             return cur_data  
 
     def getSearchHist(self): # Function to get user's search history from file to show on UI
-        """A function to get user's previous searches and return it to the caller
+        """A function to get user's previous searches and return it to the caller (UI)
 
         Attributes:
             hist_temp : dict
@@ -102,7 +102,7 @@ class dataExport():
         return hist_arr # Return search history from file 
 
     def addSearchHist(self, queryList): # Function to save user's search query to JSON file # Add current search query to data file for future reference
-        """A function to add new user search to file
+        """A function to add new user's search query to file for future retrieval
 
         Args:
             queryList : list
