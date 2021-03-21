@@ -177,7 +177,6 @@ class storage():
                 dates_temp.clear()
                 for d in cur_data: # store old crawled dates to combine with new crawled dates 
                     if d['date'] not in dates_set:
-                        print(d['date'])
                         data_temp.append(d)
                         dates_temp.append(d['date'])
 
