@@ -27,7 +27,8 @@ class crawler(ABC):
     def search(self, input):
         self.topic = input
 
-    def format(self):
+    @abstractmethod
+    def _format(self):
         pass
 
 
@@ -74,11 +75,8 @@ class redditCrawler(crawler):
         """
         super().search(input)
         self.data=[]
-        multiReddit = self.reddit.subreddits.search(self.topic, limit=10)
+        multiReddit = self.reddit.subreddits.search(self.topic, limit=7)
         for subr in multiReddit:  # get related subreddits
-            print("----------------------------------------------------------------------------")
-            print(subr.display_name)
-            print(subr.subscribers)
             try:
                 # removal of spaces and uppercase as reddit does not allow those in subreddit name
                 if self.topic.lower().replace(" ", "") in str(subr.display_name).lower():
@@ -93,15 +91,6 @@ class redditCrawler(crawler):
         self._format()
 
         return self.data
-
-        # print("Title: ",submission.title)
-        # print("Author: ",submission.author)
-        # print("link: ",submission.permalink)
-        # print("updoot: ",submission.score)
-        # print("upvote ratio: ",submission.upvote_ratio)
-        # print("comment count:",submission.num_comments)
-        # commentTree = submission.comments
-        # print("comment 1",commentTree[0].body)
 
     def generalSearch(self,input):
         """ Searches using the reddit API for the past week for the related topic in all of reddit
@@ -165,7 +154,7 @@ class redditCrawler(crawler):
         n = 0
         for d in week:
             n = n + len(d)
-        print(n, " post crawled")
+        print(n, " post crawled") #dont remove
         if n == 0:
             self.generalSearch(self.topic)
             pass
@@ -217,23 +206,10 @@ class redditCrawler(crawler):
 
         #set the lowest score of top 3
         low = top3[0].score
-        n = 1
-        for top in top3:
-            print(n, ". ", top.title)
-            print("score: ", top.score)
-            n += 1
         return low, top3 # return the lowest score and the list of top3 posts
 
     def _getScore(self, n):
         return n.score
-    # notes
-
-    # c in this case is a subreddit obj
-    # cannot iterate here as the end of the list will be reached
-    # for c in lst:
-    #     print(c.display_name)
-    #     print(c.subscribers)
-
 
 class twitterCrawler(crawler):
     """
@@ -280,7 +256,7 @@ class twitterCrawler(crawler):
         #self.topic = input
         self.topids = [] # Store every id of top tweets
 
-        tweet_limit = 50 #Controls the number of tweets to search for a day
+        tweet_limit = 100 #Controls the number of tweets to search for a day
 
         # For loop to change target day, api searches for tweets
         # The until tag returns tweets created before the given date. I.e. -1 for today, 6 for 6 days before (Total 7 days)
@@ -290,23 +266,6 @@ class twitterCrawler(crawler):
             results = self.api.search(q=f"{input} -filter:replies -filter:retweets", result_type="mixed", count=tweet_limit, until=day.strftime("%Y-%m-%d")) # Find tweets for that day
             
             self._format(results, day) # Format the search result block of that day
-
-        # Print section for checking
-        print("\n========================================Twitter Result===========================================\n")
-        
-        for n in range(0, 7):
-        
-            print(f"Day {n+1})\n")
-        
-            for i in range(len(self.data[n].topComments)):
-            
-               print(self.data[n].topComments[i].text)
-               print(self.data[n].topComments[i].url)
-               print()
-        
-            print("Total retweets: " + str(self.data[n].commentCount))
-            print("Total likes: " + str(self.data[n].interactionCount))
-            print()
            
         return self.data
 
