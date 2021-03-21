@@ -150,18 +150,13 @@ class storage():
         """
 
         dataTemp = copy.deepcopy(data)
-
         data_temp = []
         posts_temp = []
         dates_temp = [] # store data's dates for comparison to insert new entry or not
         ids_temp = []  # store posts's ids for comparison to insert new entry or not
-        
-        # get current date
-        today = date.today()
-        curr_date = today.strftime("%Y-%m-%d")
 
         source = str(dataTemp[0].source) # get the source (either reddit or twitter)
-        # print(topic, source) # print for verification
+        print("[STORAGE] Exporting Data: ", topic, " From: ", source) # print for verification
         data_file = self.path + topic + "_" + source + "_data.json" 
         posts_file = self.path + topic + "_" + source + "_posts.json"
 
@@ -173,9 +168,18 @@ class storage():
 
         try:
             cur_data = self.read_json(data_file)
-            if cur_data:
-                data_temp = [i for i in cur_data if not (i['date'] == curr_date)] # ensure that current date's data is a new set of data
-                for dates in data_temp: dates_temp.append(dates['date'])
+            if cur_data: # iterate through data if the current file has data in it
+                for entries in dataTemp: # iterate through crawled data and get new dates crawled
+                    entr_dict = vars(entries)
+                    dates_temp.append(str(dp.parse(str(entr_dict['date'])).strftime("%d-%m-%Y")))
+
+                dates_set = set(dates_temp)
+                dates_temp.clear()
+                for d in cur_data: # store old crawled dates to combine with new crawled dates 
+                    if d['date'] not in dates_set:
+                        print(d['date'])
+                        data_temp.append(d)
+                        dates_temp.append(d['date'])
 
             cur_posts = self.read_json(posts_file)
             if cur_posts:
@@ -188,16 +192,17 @@ class storage():
         date_set = set(dates_temp)
         for submission in dataTemp:
             to_dict = vars(submission)
-            to_dict['date'] = str(dp.parse(str(to_dict['date']))).split()[0]
-
-            if to_dict['date'] not in date_set: #check if date's data has been inserted to JSON file before, if not then insert it
+            if not to_dict['topic']: to_dict['topic'] = topic
+            to_dict['date'] = str(dp.parse(str(to_dict['date'])).strftime("%d-%m-%Y"))
+            
+            if to_dict['date'] not in date_set: # Update JSON file for the dates crawled, keeping previously crawled entries
                 top_com_temp = []
                 tc = submission.getTopComments()
                 
                 for posts in tc:
                     posts_dict = vars(posts)
-                    posts_dict['date'] = str(dp.parse(str(posts_dict['date'])))
-
+                    posts_dict['date'] = str(dp.parse(str(posts_dict['date'])).strftime("%d-%m-%Y %H:%M:%S"))
+                    
                     if source.lower() in posts_dict['url'].lower() and posts_dict['id'] not in id_set:
                         posts_temp.append(posts_dict)
                     
