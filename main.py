@@ -247,7 +247,6 @@ def plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesA
         i = ''.join(i.split())
         i = i[:-5]
         x.append(i)
-    print(x)
 
     # now there's 3 sets of points
     yCO = commentsArray
@@ -305,11 +304,6 @@ def show_entry_fields(self):
             displayRedditPosts(self, redResult)
             twitResult = twitterCrawl(self, strInput)
             displayTwitterTweets(self, twitResult)
-            print("=====Main====")
-            for post in redResult:
-                for i in post.getTopComments():
-                    print(i)
-
             self.cBoxGraph.bind("<<ComboboxSelected>>", lambda _: displayDay(self, redResult, twitResult))
             plotGraph(self, dayArray, commentsArray, upvotesArray, retweetsArray, likesArray)
             self.txtReddit.configure(state='disabled')
@@ -388,11 +382,6 @@ def twitterCrawl(self, strInput):
     if (strVal.strip()):
         self.txtTwitter.delete("1.0", 'end')
     twitResult = twit.search(strInput)
-    print("====Twitter====")
-    for post in twitResult:
-        for i in post.getTopComments():
-            print(i)
-
     return twitResult
 
 def displayTwitterTweets(self, twitResult):
