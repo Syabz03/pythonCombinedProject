@@ -1,7 +1,7 @@
 import json
 import dateparser as dp
 from pathlib import Path
-from datetime import date
+from datetime import date, timedelta
 import copy
 
 class storage():
@@ -156,7 +156,7 @@ class storage():
         ids_temp = []  # store posts's ids for comparison to insert new entry or not
 
         source = str(dataTemp[0].source) # get the source (either reddit or twitter)
-        print("[STORAGE] Exporting Data: ", topic, " From: ", source) # print for verification
+        print("[STORAGE] Query: ", topic, ", From: ", source) # print for verification
         data_file = self.path + topic + "_" + source + "_data.json" 
         posts_file = self.path + topic + "_" + source + "_posts.json"
 
@@ -192,7 +192,11 @@ class storage():
         for submission in dataTemp:
             to_dict = vars(submission)
             if not to_dict['topic']: to_dict['topic'] = topic
-            to_dict['date'] = str(dp.parse(str(to_dict['date'])).strftime("%d-%m-%Y"))
+            if source.lower() == 'twitter':
+                newDate = to_dict['date'] - timedelta(days=1)
+                to_dict['date'] = str(dp.parse(str(newDate)).strftime("%d-%m-%Y"))
+            else:
+                to_dict['date'] = str(dp.parse(str(to_dict['date'])).strftime("%d-%m-%Y"))
             
             if to_dict['date'] not in date_set: # Update JSON file for the dates crawled, keeping previously crawled entries
                 top_com_temp = []
